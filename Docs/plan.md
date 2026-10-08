@@ -216,7 +216,43 @@ The matrix states who may perform which action. **Anything not listed here is de
 - A request with a valid token for an action that is not allowed is answered with `403 Forbidden`.
 - Each "no", "own only" and "not allowed" entry in this section has at least one test that expects the request to be rejected.
 
+## 5. STRIDE analysis
+
+STRIDE is a checklist of six kinds of threat. Each one breaks a different security property:
+
+| Letter | Threat | Property it breaks |
+|---|---|---|
+| S | Spoofing | Authenticity: pretending to be someone else |
+| T | Tampering | Integrity: changing data without permission |
+| R | Repudiation | Accountability: denying an action because nothing recorded it |
+| I | Information disclosure | Confidentiality: reading data without permission |
+| D | Denial of service | Availability: making the system unusable |
+| E | Elevation of privilege | Authorization: gaining more rights than granted |
+
+Assets (A1–A10) refer to section 2 and boundaries (TB1–TB6) to section 3.
+
+| ID | Type | Threat | Assets | Boundary | Control |
+|---|---|---|---|---|---|
+| T1 | S | An attacker logs in as another user by guessing the password | A1 | TB1 | Passwords stored as salted hashes using an established library; the same error message for wrong username and wrong password |
+| T2 | S | A user forges or edits a user token | A2, A3 | TB1, TB2 | Tokens signed with an established library; signature, expiry and intended service verified on every request by both the API and the Booking service |
+| T3 | S | A caller on the internal network pretends to be the API and starts a job or presents a self-made job token | A3, A7 | TB3, TB4 | Asymmetric signatures: only the API holds the signing key, the other services hold only the verification key |
+| T4 | T | A player cancels another player's booking by changing the id in the request | A4 | TB1, TB2 | Ownership check in the Booking service on every booking request |
+| T5 | T | A player creates a booking in another player's name by putting that name in the request | A4 | TB1, TB2 | Owner is taken from the token, never from the request body |
+| T6 | T | Request data changes the meaning of a database query (SQL injection) | A4, A5, A6 | TB5 | Parameterized queries; input validated for type and length |
+| T7 | T | The Schedule service saves oversized or malformed content, or a schedule for a different player | A6 | TB4 | Owner taken from the job token; content checked for type and size before storing |
+| T8 | T | A modified `pitchgrid` package enters the build | A8 | TB6 | Manifest with SHA-256 digest controlled by the consumer; build fails on mismatch |
+| T9 | R | A user denies making or cancelling a booking; rejected attempts leave no trace | A10 | TB1, TB2 | Every state-changing request and every denied request is logged with user id, action, resource id and time |
+| T10 | I | A player reads another player's booking or schedule by guessing its id | A4, A6 | TB1, TB2 | Ownership check in the Booking service on every read |
+| T11 | I | The Schedule service reads more than its job needs, such as other players' bookings | A4, A7 | TB4 | The Booking service enforces the player and week named in the job token |
+| T12 | I | Secrets or tokens leak through logs, error messages or the repository | A2, A3 | all | Generic error messages; secrets supplied through configuration and never committed; secret scanning in the pipeline |
+| T13 | D | Oversized requests or a flood of schedule jobs exhaust a service | A4, A6 | TB1, TB3 | Request size limits and job timeouts. High availability is out of scope, so only basic limits are applied |
+| T14 | E | A player performs an admin action such as removing a pitch | A5 | TB1, TB2 | Role check in the Booking service; role taken from the token |
+| T15 | E | Malicious code inside `pitchgrid` uses the Schedule service's permissions to reach data outside its job | A4, A7, A8 | TB4, TB6 | Schedule service has no database access, no user tokens and no signing key; job token is narrow and short-lived; container runs as a non-root user on the internal network only |
+
+### Planted vulnerabilities
+
+Three vulnerabilities from the course catalog and one arising from the composition of components will be planted deliberately. Each will be recorded against the threat ID whose control it weakens, and documented in the report.
+
 ## Sections to be added
 
-5. STRIDE analysis
 6. Phase plan: requirements, implementation and build, testing, release (asset → threat → control → activity → evidence → gate)
