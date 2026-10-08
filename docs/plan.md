@@ -1,33 +1,33 @@
 # Lifecycle plan
 
-This plan is written before any feature is implemented. It is extended section by section; each section is committed before the work it describes begins.
+This plan is written before any feature is implemented. It is extended section by section and each section is committed before the work it describes begins.
 
 ## 1. Scope
 
 ### Purpose
 
-A small system where players book football pitches in Brașov and view their own bookings. The admin is the pitch owner: they publish their pitches and see every booking made on them. The system is split into three services so that authorization can be studied across service boundaries.
+A small system where players book football pitches in Brașov and view their own bookings. The admin runs the platform: they add and remove pitches and can see every booking. The system is split into three services so that authorization can be studied across service boundaries.
 
 ### Roles
 
 | Role | Type | What it can do |
 |---|---|---|
 | player | ordinary | List pitches, create a booking, see and cancel only their own bookings, request and download their own weekly schedule |
-| admin | privileged | The pitch owner. Publishes and removes pitches, sees all bookings, cancels any booking. Does not create bookings. |
+| admin | privileged | The platform administrator. Adds and removes pitches, sees all bookings, cancels any booking. Does not create bookings. |
 
 Seeded accounts (synthetic data, no registration):
 
-- `andrei` (player)
-- `maria` (player)
-- `admin` (admin, the pitch owner)
+- `darius` (player)
+- `rui` (player)
+- `admin` (admin)
 
-One admin is seeded, so "all bookings" and "bookings on the admin's pitches" are the same set. Two players are needed so that tests can show one player cannot reach the other player's bookings or schedules.
+Two players are needed so that tests can show one player cannot reach the other player's bookings or schedules.
 
 ### Entities
 
 | Entity | Fields | Owner |
 |---|---|---|
-| Pitch | id, name, address, price_per_hour | the admin who published it |
+| Pitch | id, name, address, price_per_hour | system (managed by the admin) |
 | Booking | id, pitch_id, user_id, date, start_hour, status | the player who created it |
 
 Generated result (not a main entity): **Schedule**: id, owner_id, week, content, created_at. It is owned by the player who requested it.
@@ -66,7 +66,7 @@ flowchart LR
 | 3 | Create a booking (rejected if the slot is taken) | player | User → API → Booking service |
 | 4 | List or cancel own bookings | player | User → API → Booking service |
 | 5 | Request weekly schedule, then download it | player | User → API → Schedule service → Booking service → `pitchgrid` → Booking service → API → User |
-| 6 | Publish or remove a pitch | admin | User → API → Booking service |
+| 6 | Add or remove a pitch | admin | User → API → Booking service |
 | 7 | List all bookings, cancel any booking | admin | User → API → Booking service |
 
 Operation 5 involves all three components and the helper package.
@@ -95,7 +95,7 @@ Ratings: H = high, M = medium, L = low.
 | A2 | User access tokens | Issued by API, sent with every request | each user | H | H | L | A stolen or forged token gives the user's authority until it expires |
 | A3 | Signing keys and service secrets | Configuration of each service | system | H | H | M | Whoever has them can create valid tokens for any user or service |
 | A4 | Bookings | Booking service database | the player who created it | M | H | M | Show who plays where and when; must not be changed or cancelled by others |
-| A5 | Pitches | Booking service database | admin | L | H | M | Visible to all users, but only the admin may change them |
+| A5 | Pitches | Booking service database | system (managed by the admin) | L | H | M | Visible to all users, but only the admin may change them |
 | A6 | Schedules (generated results) | Booking service database | the player who requested it | M | H | L | Contain a player's bookings; must reach only that player |
 | A7 | Job authority (what the Schedule service is allowed to read for one job) | Passed from API to Schedule service to Booking service | the player who started the job | H | H | L | If it is too broad, the Schedule service can read other players' data |
 | A8 | Helper package `pitchgrid` and its approval manifest | Package directory; manifest in the Schedule service build | system | L | H | M | A modified package runs with the Schedule service's permissions |
@@ -189,7 +189,7 @@ The matrix states who may perform which action. **Anything not listed here is de
 |---|---|---|---|
 | Log in | yes | yes | yes |
 | List pitches | no | yes | yes |
-| Publish a pitch | no | no | yes |
+| Add a pitch | no | no | yes |
 | Remove a pitch | no | no | yes |
 | Create a booking | no | yes, for themselves only | no |
 | List bookings | no | own only | all |
@@ -285,7 +285,7 @@ Each threat from section 5 is linked to the activity that builds its control, th
 | T11 | Job token scope enforced by the Booking service | A job token for one player cannot read another player's bookings or another week | G3 |
 | T12 | Secret handling and generic errors | Secret scan report; error responses contain no internal details | G2, G3 |
 | T13 | Request size limits and job timeouts | An oversized request is rejected | G3 |
-| T14 | Role check in the Booking service | A player publishing or removing a pitch gets 403 | G3 |
+| T14 | Role check in the Booking service | A player adding or removing a pitch gets 403 | G3 |
 | T15 | Isolation of the Schedule service | Review of the container configuration (non-root user, internal network, no database volume); optional supply chain experiment | G2, G3 |
 
 ### Pipeline
