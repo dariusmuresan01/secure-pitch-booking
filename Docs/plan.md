@@ -253,6 +253,64 @@ Assets (A1–A10) refer to section 2 and boundaries (TB1–TB6) to section 3.
 
 Three vulnerabilities from the course catalog and one arising from the composition of components will be planted deliberately. Each will be recorded against the threat ID whose control it weakens, and documented in the report.
 
-## Sections to be added
+## 6. Phase plan
 
-6. Phase plan: requirements, implementation and build, testing, release (asset → threat → control → activity → evidence → gate)
+The project moves through four phases. A phase ends at a gate: a fixed list of conditions that must hold before the next phase starts. A passed gate is recorded as a Git tag on the commit that was reviewed.
+
+### Phases and gates
+
+| Phase | Deliverables | Gate |
+|---|---|---|
+| 1. Requirements | Sections 1 to 5 of this plan: scope and operations, asset register, trust boundaries, access control matrix, STRIDE analysis | **G1:** the architecture meets the scope (three components, helper package, at least three operations, one across all components); every asset has an owner; every operation appears in the access control matrix; every threat has a control |
+| 2. Implementation and build | Three working components, each in its own container; `pitchgrid` built as an installable package; all dependencies pinned with hashes; one command builds everything | **G2:** the build fails if a dependency is not listed and pinned, or if the `pitchgrid` digest differs from the manifest; no blocking static analysis, dependency or secret findings |
+| 3. Testing | Functional tests for every operation; authorization tests for every denied entry in section 4; tests with malformed input; investigation and fixes | **G3:** all functional and security tests pass; malformed input and altered artifacts are rejected |
+| 4. Release, deploy and operation | Discussion in the report of what a production release would need | No gate; not implemented |
+
+### Traceability
+
+Each threat from section 5 is linked to the activity that builds its control, the evidence that the control works, and the gate that checks it. Assets and controls for each threat are listed in section 5.
+
+| Threat | Lifecycle activity | Test or evidence | Gate |
+|---|---|---|---|
+| T1 | Password hashing in the API | Wrong password is rejected; the stored value is not the plain password | G3 |
+| T2 | Token verification in the API and the Booking service | Expired, modified and wrong-service tokens are rejected with 401 | G3 |
+| T3 | Asymmetric token signing; key distribution in the deployment configuration | A job token signed with another key is rejected; only the API container holds the signing key | G2, G3 |
+| T4 | Ownership check on booking changes | One player cancelling another player's booking gets 403 | G3 |
+| T5 | Owner taken from the token | A booking created with another player's id in the body is still owned by the caller | G3 |
+| T6 | Parameterized queries | Static analysis report; requests containing SQL fragments are handled as plain data | G2, G3 |
+| T7 | Validation of schedule content | Oversized or wrongly typed schedule content is rejected | G3 |
+| T8 | Manifest check in the build | A build with an altered package fails | G2 |
+| T9 | Logging of changes and denials | A denied request produces a log entry; logs contain no tokens | G3 |
+| T10 | Ownership check on reads | One player reading another player's booking or schedule gets 403 | G3 |
+| T11 | Job token scope enforced by the Booking service | A job token for one player cannot read another player's bookings or another week | G3 |
+| T12 | Secret handling and generic errors | Secret scan report; error responses contain no internal details | G2, G3 |
+| T13 | Request size limits and job timeouts | An oversized request is rejected | G3 |
+| T14 | Role check in the Booking service | A player publishing or removing a pitch gets 403 | G3 |
+| T15 | Isolation of the Schedule service | Review of the container configuration (non-root user, internal network, no database volume); optional supply chain experiment | G2, G3 |
+
+### Pipeline
+
+A Jenkins pipeline, defined in a `Jenkinsfile` in the repository, runs on every push and pull request. Jenkins itself runs locally in a container.
+
+| Stage | What it does | Tool |
+|---|---|---|
+| 1. Validate | Checks that every dependency is pinned with a hash and that the `pitchgrid` digest matches the manifest | pip, checksum script |
+| 2. Build | Builds the `pitchgrid` package and the three container images | Python build tools, Docker |
+| 3. Static analysis | Scans the source for insecure code patterns and committed secrets | Bandit, Gitleaks |
+| 4. Dependency analysis | Checks dependencies against known vulnerabilities | pip-audit |
+| 5. Test environment | Starts the three services from scratch with freshly seeded data | Docker Compose |
+| 6. Tests | Runs functional and authorization tests | pytest |
+| 7. Archive | Saves test, static analysis and dependency reports as build artifacts | Jenkins |
+| 8. Clean up | Stops and removes the test environment | Docker Compose |
+
+### Findings that block a release
+
+The pipeline fails, and the gate is not passed, on any of the following:
+
+- a failing functional or authorization test
+- a dependency that is not pinned with a hash, or a `pitchgrid` digest that does not match the manifest
+- a high-severity static analysis finding
+- a known vulnerability in a dependency, unless it is listed with a justification in an exceptions file
+- a secret detected in the repository
+
+Planted vulnerabilities are the only accepted exceptions. Each one is listed in a known-vulnerabilities file together with the test that demonstrates it, so the pipeline reports it without treating it as an unexpected failure.
