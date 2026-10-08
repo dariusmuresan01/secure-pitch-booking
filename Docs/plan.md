@@ -102,9 +102,85 @@ Ratings: H = high, M = medium, L = low.
 | A9 | Source code, Jenkinsfile, container images | Git repository, build environment | system | L | H | M | Changes here change what every service does |
 | A10 | Logs, test and analysis results | Service output, Jenkins artifacts | system | M | H | L | Evidence for gate decisions; must not contain secrets or tokens |
 
+## 3. Trust boundaries and data flow
+
+A trust boundary is a point where data passes from one party to another that should not simply believe it. Everything that crosses a boundary is checked by the receiver.
+
+### Zones
+
+```mermaid
+flowchart LR
+    subgraph outside["Outside (untrusted)"]
+        U[User CLI]
+    end
+    subgraph internal["Internal network"]
+        A[Application API]
+        S[Schedule service]
+        subgraph bookingzone["Booking service zone"]
+            B[Booking service]
+            D[(SQLite database)]
+        end
+    end
+    subgraph supplier["Supplier (untrusted)"]
+        P[pitchgrid package]
+    end
+    U -->|TB1| A
+    A -->|TB2| B
+    A -->|TB3| S
+    S -->|TB4| B
+    B -->|TB5| D
+    P -.->|TB6| S
+```
+
+Only the Application API is reachable from outside. The Booking service and the Schedule service listen only on the internal network.
+
+### Boundaries
+
+| ID | Boundary | What crosses | The receiver must not assume | Planned control |
+|---|---|---|---|---|
+| TB1 | User → API | Username and password, user token, request data | That the caller is who they claim to be, or that the input is well formed | Login required; token verified on every request; input validated |
+| TB2 | API → Booking service | User token, request data | That a request is allowed just because it came from the API | Booking service verifies the token itself and checks role and ownership for each resource |
+| TB3 | API → Schedule service | Job request, job token | That every job request is legitimate | Accepts only job tokens issued by the API; never receives the user token |
+| TB4 | Schedule service → Booking service | Job token, read request, schedule to save | That the Schedule service may read whatever it asks for | Job token limits access to one player, one week, the actions "read bookings" and "save schedule", and a short lifetime; schedule content is validated before it is stored |
+| TB5 | Booking service → database | SQL queries built from request data | That request data is safe to place in a query | Parameterized queries; database file accessible only to the Booking service container |
+| TB6 | Supplier → Schedule service build | Package artifact | That a package with the right name and version is the approved one | Manifest controlled by the consumer with a SHA-256 digest; build fails on mismatch; Schedule service has no database access and no user tokens |
+
+### Where trust is established
+
+- **Identity:** at the API, when the user logs in.
+- **Authority:** in tokens issued by the API. The user token carries the user id, role, intended services and expiry. The job token carries the player, the week, the allowed actions, the target service and expiry.
+- **Ownership:** in the Booking service, which records the owner on every booking and schedule and compares it with the token on every request.
+- **Dependency trust:** in the approval manifest, checked when the Schedule service is built.
+
+### Data flow for operation 5 (weekly schedule)
+
+```mermaid
+sequenceDiagram
+    actor P as Player
+    participant A as Application API
+    participant S as Schedule service
+    participant B as Booking service
+    P->>A: Request schedule for week W (user token)
+    A->>A: Verify user token
+    A->>S: Start job (job token for this player and week W)
+    S->>B: Read bookings (job token)
+    B->>B: Verify job token
+    B-->>S: Only this player's bookings for week W
+    S->>S: Build timetable with pitchgrid
+    S->>B: Save schedule (job token)
+    B->>B: Verify job token and validate content
+    B-->>S: Schedule id
+    S-->>A: Job done, schedule id
+    A-->>P: Schedule id
+    P->>A: Download schedule (user token)
+    A->>B: Get schedule (user token)
+    B->>B: Check requester owns the schedule
+    B-->>A: Schedule
+    A-->>P: Schedule
+```
+
 ## Sections to be added
 
-3. Trust boundaries and data flow
 4. Access control matrix
 5. STRIDE analysis
 6. Phase plan: requirements, implementation and build, testing, release (asset → threat → control → activity → evidence → gate)
