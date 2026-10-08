@@ -179,8 +179,44 @@ sequenceDiagram
     A-->>P: Schedule
 ```
 
+## 4. Access control matrix
+
+The matrix states who may perform which action. **Anything not listed here is denied.**
+
+### Users
+
+| Action | Anonymous | Player | Admin |
+|---|---|---|---|
+| Log in | yes | yes | yes |
+| List pitches | no | yes | yes |
+| Publish a pitch | no | no | yes |
+| Remove a pitch | no | no | yes |
+| Create a booking | no | yes, for themselves only | no |
+| List bookings | no | own only | all |
+| View one booking | no | own only | all |
+| Cancel a booking | no | own only | any |
+| Request a weekly schedule | no | yes, from own bookings only | no |
+| Download a schedule | no | own only | no |
+
+### Services
+
+| Caller → target | Credential | Allowed | Not allowed |
+|---|---|---|---|
+| API → Booking service | The user's token | Forward the user's request; the Booking service applies the user matrix above | Any request without a valid user token |
+| API → Schedule service | Job token created by the API | Start one schedule job | Anything else |
+| Schedule service → Booking service | Job token | Read the bookings of the player and week named in the token; save one schedule owned by that player | Read other players' bookings, read any schedule, create or cancel bookings, change pitches |
+| Schedule service → API | none | nothing | everything |
+| Booking service → any service | none | nothing; it only answers requests | everything |
+| `pitchgrid` package | none | Receive a list of bookings as input and return text | Network access, file access, reading tokens or environment secrets |
+
+### Rules
+
+- The owner of a new booking or schedule is taken from the token, never from the request body.
+- A request with no valid token is answered with `401 Unauthorized`.
+- A request with a valid token for an action that is not allowed is answered with `403 Forbidden`.
+- Each "no", "own only" and "not allowed" entry in this section has at least one test that expects the request to be rejected.
+
 ## Sections to be added
 
-4. Access control matrix
 5. STRIDE analysis
 6. Phase plan: requirements, implementation and build, testing, release (asset → threat → control → activity → evidence → gate)
