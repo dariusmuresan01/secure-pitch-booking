@@ -17,8 +17,8 @@ A small system where players book football pitches in Brașov and view their own
 
 Seeded accounts (synthetic data, no registration):
 
-- `Messi` (player)
-- `Ronaldo` (player)
+- `andrei` (player)
+- `maria` (player)
 - `admin` (admin, the pitch owner)
 
 One admin is seeded, so "all bookings" and "bookings on the admin's pitches" are the same set. Two players are needed so that tests can show one player cannot reach the other player's bookings or schedules.
@@ -79,9 +79,31 @@ A command-line client or an API test collection. No graphical interface.
 
 Account registration, web or mobile interface, real payments, email, public hosting, high availability, performance at scale.
 
+## 2. Asset register
+
+An asset is anything in the system that is worth protecting. Each asset is rated on three needs:
+
+- **C (confidentiality):** only the right people can read it
+- **I (integrity):** only the right people can change it
+- **A (availability):** it is there when needed
+
+Ratings: H = high, M = medium, L = low.
+
+| ID | Asset | Where it lives | Owner | C | I | A | Why it matters |
+|---|---|---|---|---|---|---|---|
+| A1 | User credentials (password hashes) | API, seeded user store | each user | H | H | M | Whoever has them can log in as that user |
+| A2 | User access tokens | Issued by API, sent with every request | each user | H | H | L | A stolen or forged token gives the user's authority until it expires |
+| A3 | Signing keys and service secrets | Configuration of each service | system | H | H | M | Whoever has them can create valid tokens for any user or service |
+| A4 | Bookings | Booking service database | the player who created it | M | H | M | Show who plays where and when; must not be changed or cancelled by others |
+| A5 | Pitches | Booking service database | admin | L | H | M | Visible to all users, but only the admin may change them |
+| A6 | Schedules (generated results) | Booking service database | the player who requested it | M | H | L | Contain a player's bookings; must reach only that player |
+| A7 | Job authority (what the Schedule service is allowed to read for one job) | Passed from API to Schedule service to Booking service | the player who started the job | H | H | L | If it is too broad, the Schedule service can read other players' data |
+| A8 | Helper package `pitchgrid` and its approval manifest | Package directory; manifest in the Schedule service build | system | L | H | M | A modified package runs with the Schedule service's permissions |
+| A9 | Source code, Jenkinsfile, container images | Git repository, build environment | system | L | H | M | Changes here change what every service does |
+| A10 | Logs, test and analysis results | Service output, Jenkins artifacts | system | M | H | L | Evidence for gate decisions; must not contain secrets or tokens |
+
 ## Sections to be added
 
-2. Asset register
 3. Trust boundaries and data flow
 4. Access control matrix
 5. STRIDE analysis
