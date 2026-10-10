@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 
 
 app = FastAPI()
@@ -18,3 +18,11 @@ pitches = [
 @app.get("/pitches")
 def list_pitches():
     return pitches
+
+
+@app.get("/pitches/{pitch_id}")
+def get_pitch(pitch_id: int):
+    for pitch in pitches: 
+        if pitch["id"] == pitch_id: 
+            return pitch
+    raise HTTPException(status_code=404, detail="Pitch not found")
