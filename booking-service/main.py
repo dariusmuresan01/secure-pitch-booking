@@ -1,4 +1,5 @@
 import sqlite3
+import datetime
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
@@ -11,6 +12,7 @@ app = FastAPI()
 def get_connection():
     connection = sqlite3.connect(DATABASE)
     connection.row_factory = sqlite3.Row
+    connection.execute("PRAGMA foreign_keys = ON")
     return connection
 
 
@@ -64,4 +66,41 @@ def create_pitch(pitch:PitchCreate):
         "name": pitch.name,
         "address": pitch.address,
         "price_per_hour": pitch.price_per_hour
+    }
+
+class BookingCreate(BaseModel):
+    pitch_id: int = Field(gt=0)
+    user_id: str = Field(min_length=1, max_length=200)
+    date: datetime.date
+    start_hour: int = Field(gt=9, le=22)
+
+# TODO: take user_id from the token, not from the body (threat T5)
+@app.post("/bookings", status_code=201)
+def create_booking(booking:BookingCreate):
+    connection = get_connection()
+    pitch = connection.execute(
+        "SELECT id FROM pitches WHERE id = ?",
+        (booking.pitch_id,),
+    ).fetchone()
+    if pitch is None:
+        connection.close()
+        raise HTTPException(status_code=404, detail="Pitch not found")
+    try: 
+        cursor = connection.execute(
+            "INSERT INTO bookings (pitch_id, user_id, date, start_hour) VALUES (?, ?, ?, ?)",
+            (booking.pitch_id, booking.user_id, booking.date.isoformat(), booking.start_hour)
+        )
+        connection.commit()
+    except sqlite3.IntegrityError:
+        connection.close()
+        raise HTTPException(status_code=409, detail="The pitch is already booked in that hour")
+    new_id = cursor.lastrowid
+    connection.close()
+    return {
+        "id": new_id,
+        "pitch_id": booking.pitch_id,
+        "user_id": booking.user_id,
+        "date": booking.date.isoformat(),
+        "start_hour": booking.start_hour,
+        "status": "active"
     }
