@@ -68,11 +68,13 @@ def create_pitch(pitch:PitchCreate):
         "price_per_hour": pitch.price_per_hour
     }
 
+
 class BookingCreate(BaseModel):
     pitch_id: int = Field(gt=0)
     user_id: str = Field(min_length=1, max_length=200)
     date: datetime.date
     start_hour: int = Field(gt=9, le=22)
+
 
 # TODO: take user_id from the token, not from the body (threat T5)
 @app.post("/bookings", status_code=201)
@@ -105,6 +107,7 @@ def create_booking(booking:BookingCreate):
         "status": "active"
     }
 
+
 # TODO: take user_id from the token, not from the query (threat T10)
 @app.get("/bookings")
 def get_bookings(user_id: str):
@@ -115,3 +118,32 @@ def get_bookings(user_id: str):
     ).fetchall()
     connection.close()
     return [dict(row) for row in rows]
+
+
+# TODO: take user_id from the token, not from the query (threat T4); admin may cancel any booking
+@app.post("/bookings/{booking_id}/cancel")
+def cancel_booking(booking_id: int, user_id: str):
+    connection = get_connection()
+    booking = connection.execute(
+        "SELECT id, pitch_id, user_id, date, start_hour, status FROM bookings WHERE id = ?",
+        (booking_id,),
+    ).fetchone()
+    if booking is None: 
+        connection.close()
+        raise HTTPException(status_code=404, detail="Booking not found")
+    if booking["user_id"] != user_id:
+        connection.close()
+        raise HTTPException(status_code=403, detail="Not allowed to cancel this booking")
+    if booking["status"] != "active":
+        connection.close()
+        raise HTTPException(status_code=409, detail="Booking is already cancelled")
+    connection.execute(
+        "UPDATE bookings SET status = 'cancelled' WHERE id = ?",
+        (booking_id,),
+    )
+    connection.commit()
+    connection.close()
+    result = dict(booking)
+    result["status"] = "cancelled"
+    return result
+
