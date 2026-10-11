@@ -104,3 +104,14 @@ def create_booking(booking:BookingCreate):
         "start_hour": booking.start_hour,
         "status": "active"
     }
+
+# TODO: take user_id from the token, not from the query (threat T10)
+@app.get("/bookings")
+def get_bookings(user_id: str):
+    connection = get_connection()
+    rows = connection.execute(
+        "SELECT id, pitch_id, user_id, date, start_hour, status FROM bookings WHERE user_id = ?",
+        (user_id,)
+    ).fetchall()
+    connection.close()
+    return [dict(row) for row in rows]
