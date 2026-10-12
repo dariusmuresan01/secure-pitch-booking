@@ -1,0 +1,7 @@
+# Used only by the Jenkins pipeline, on top of docker-compose.yml.
+services:
+  api:
+    ports: !reset []
+  tests:
+    volumes:
+      - ./reports:/reports
