@@ -1,10 +1,15 @@
 import sqlite3
 import datetime
+import jwt
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel, Field
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from pathlib import Path
 
 DATABASE = "booking.db"
+PUBLIC_KEY = Path("../keys/public.pem").read_text()
+bearer = HTTPBearer(auto_error=False)
 
 app = FastAPI()
 
@@ -19,6 +24,24 @@ def get_connection():
 @app.get("/health")
 def health():
     return {"status": "ok", "service": "booking-service"}
+
+def get_current_user(
+        credentials: HTTPAuthorizationCredentials | None = Depends(bearer),
+) -> dict:
+    if credentials is None:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    try: 
+        claims = jwt.decode(
+            credentials.credentials,
+            PUBLIC_KEY,
+            algorithms=["EdDSA"],
+            audience="booking-service",
+            issuer="api",
+            options={"require": ["iss", "sub", "aud", "iat", "exp"]},
+        )
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    return claims
 
 
 @app.get("/pitches")
@@ -71,14 +94,14 @@ def create_pitch(pitch:PitchCreate):
 
 class BookingCreate(BaseModel):
     pitch_id: int = Field(gt=0)
-    user_id: str = Field(min_length=1, max_length=200)
     date: datetime.date
     start_hour: int = Field(gt=9, le=22)
 
 
-# TODO: take user_id from the token, not from the body (threat T5)
 @app.post("/bookings", status_code=201)
-def create_booking(booking:BookingCreate):
+def create_booking(booking:BookingCreate, user: dict = Depends(get_current_user)):
+    if user["role"] != "player":
+        raise HTTPException(status_code=403, detail="Only players can create bookings")
     connection = get_connection()
     pitch = connection.execute(
         "SELECT id FROM pitches WHERE id = ?",
@@ -90,7 +113,7 @@ def create_booking(booking:BookingCreate):
     try: 
         cursor = connection.execute(
             "INSERT INTO bookings (pitch_id, user_id, date, start_hour) VALUES (?, ?, ?, ?)",
-            (booking.pitch_id, booking.user_id, booking.date.isoformat(), booking.start_hour)
+            (booking.pitch_id, user["sub"], booking.date.isoformat(), booking.start_hour)
         )
         connection.commit()
     except sqlite3.IntegrityError:
@@ -101,20 +124,19 @@ def create_booking(booking:BookingCreate):
     return {
         "id": new_id,
         "pitch_id": booking.pitch_id,
-        "user_id": booking.user_id,
+        "user_id": user["sub"],
         "date": booking.date.isoformat(),
         "start_hour": booking.start_hour,
         "status": "active"
     }
 
 
-# TODO: take user_id from the token, not from the query (threat T10)
 @app.get("/bookings")
-def get_bookings(user_id: str):
+def get_bookings(user: dict = Depends(get_current_user)):
     connection = get_connection()
     rows = connection.execute(
         "SELECT id, pitch_id, user_id, date, start_hour, status FROM bookings WHERE user_id = ?",
-        (user_id,)
+        (user["sub"],)
     ).fetchall()
     connection.close()
     return [dict(row) for row in rows]
