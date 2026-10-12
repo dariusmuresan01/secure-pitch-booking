@@ -173,3 +173,27 @@ def cancel_booking(booking_id: int, user: dict = Depends(get_current_user)):
     result = dict(booking)
     result["status"] = "cancelled"
     return result
+
+
+@app.delete("/pitches/{pitch_id}", status_code=204)
+def delete_pitch(pitch_id: int, user: dict = Depends(get_current_user)):
+    if user["role"] != "admin" :
+        raise HTTPException(status_code=403, detail="Only admins can remove pitches")
+    connection = get_connection()
+    pitch = connection.execute(
+        "SELECT id FROM pitches WHERE id = ?",
+        (pitch_id,),
+    ).fetchone()
+    if pitch is None:
+        connection.close()
+        raise HTTPException(status_code=404, detail="Pitch not found")
+    try: 
+        connection.execute(
+            "DELETE FROM pitches WHERE id = ?",
+            (pitch_id,),
+        )
+        connection.commit()
+    except sqlite3.IntegrityError:
+        connection.close()
+        raise HTTPException(status_code=409, detail="Pitch has bookings and cannot be removed")
+    connection.close()
