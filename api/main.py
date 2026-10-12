@@ -1,5 +1,6 @@
 import datetime
 import sqlite3
+import os
 from pathlib import Path
 
 import httpx
@@ -10,13 +11,13 @@ from fastapi import Depends, FastAPI, HTTPException, Response
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, Field
 
-DATABASE = "users.db"
-PRIVATE_KEY = Path("../keys/private.pem").read_text()
-PUBLIC_KEY = Path("../keys/public.pem").read_text()
+DATABASE = os.environ.get("DATABASE_PATH", "users.db")
+PRIVATE_KEY = Path(os.environ.get("PRIVATE_KEY_PATH", "../keys/private.pem")).read_text()
+PUBLIC_KEY = Path(os.environ.get("PUBLIC_KEY_PATH", "../keys/public.pem")).read_text()
 TOKEN_LIFETIME = datetime.timedelta(minutes=15)
 JOB_TOKEN_LIFETIME = datetime.timedelta(minutes=2)
-BOOKING_SERVICE_URL = "http://localhost:8001"
-SCHEDULE_SERVICE_URL = "http://localhost:8002"
+BOOKING_SERVICE_URL = os.environ.get("BOOKING_SERVICE_URL", "http://localhost:8001")
+SCHEDULE_SERVICE_URL = os.environ.get("SCHEDULE_SERVICE_URL", "http://localhost:8002")
 bearer = HTTPBearer(auto_error=False)
 
 app = FastAPI()

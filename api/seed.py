@@ -1,9 +1,10 @@
 import sqlite3
+import os
 
 from argon2 import PasswordHasher
 
 hasher = PasswordHasher()
-connection = sqlite3.connect("users.db")
+connection = sqlite3.connect(os.environ.get("DATABASE_PATH", "users.db"))
 
 
 connection.execute("DROP TABLE IF EXISTS users")

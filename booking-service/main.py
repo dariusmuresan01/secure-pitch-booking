@@ -1,5 +1,6 @@
 import datetime
 import sqlite3
+import os
 from pathlib import Path
 
 import jwt
@@ -7,8 +8,8 @@ from fastapi import Depends, FastAPI, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, Field
 
-DATABASE = "booking.db"
-PUBLIC_KEY = Path("../keys/public.pem").read_text()
+DATABASE = os.environ.get("DATABASE_PATH", "booking.db")
+PUBLIC_KEY = Path(os.environ.get("PUBLIC_KEY_PATH", "../keys/public.pem")).read_text()
 bearer = HTTPBearer(auto_error=False)
 
 app = FastAPI()

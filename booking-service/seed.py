@@ -1,6 +1,7 @@
 import sqlite3
+import os
 
-connection = sqlite3.connect("booking.db")
+connection = sqlite3.connect(os.environ.get("DATABASE_PATH", "booking.db"))
 
 connection.execute("DROP TABLE IF EXISTS bookings")
 
