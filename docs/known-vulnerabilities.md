@@ -1,8 +1,7 @@
 # Known vulnerabilities
 
 This application contains four vulnerabilities planted on purpose for
-Software Security Assignment I. They are **off by default**: every
-service runs in secure mode unless `VULNERABLE_MODE` is exactly `1`.
+educational purposes. They are **off by default**: every
 
 Do not deploy this application with `VULNERABLE_MODE=1`.
 
@@ -22,7 +21,7 @@ suite in secure mode, and stage 8 runs the demonstration tests in vulnerable mod
 | V1 | CWE-862 Missing Authorization | `booking-service/main.py`, `get_schedule` | T10 | Any logged-in user reads any player's schedule by its id | `test_v1_missing_authorization.py` |
 | V2 | CWE-89 SQL Injection | `booking-service/main.py`, `get_bookings` (status filter) | T6 | A player reads every player's bookings | `test_v2_sql_injection.py` |
 | V3 | CWE-20 Improper Input Validation | `booking-service/main.py`, `create_booking` (date) | T5, T7 | A player stores fabricated bookings in the past | `test_v3_input_validation.py` |
-| V4 | Composition (not in the catalogue) | `booking-service` `/jobs/bookings` + `schedule-service` `/jobs` | T11 | A player's own schedule contains other players' bookings | `test_v4_composition.py` |
+| V4 | Composition vulnerability | `booking-service` `/jobs/bookings` + `schedule-service` `/jobs` | T11 | A player's own schedule contains other players' bookings | `test_v4_composition.py` |
 
 ## What detected them
 

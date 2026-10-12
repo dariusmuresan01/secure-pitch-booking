@@ -1,4 +1,4 @@
-# Switches ON the intentional vulnerabilities for the assignment demo.
+# Switches ON the intentional vulnerabilities for a local demo.
 # Used only on top of docker-compose.yml. Never use it outside the demo.
 services:
   booking-service:

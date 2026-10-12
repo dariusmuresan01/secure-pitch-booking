@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field
 
 DATABASE = os.environ.get("DATABASE_PATH", "booking.db")
 PUBLIC_KEY = Path(os.environ.get("PUBLIC_KEY_PATH", "../keys/public.pem")).read_text()
-# Intentional vulnerabilities for the assignment. Secure unless exactly "1".
+# Intentional vulnerabilities for demonstration. Secure unless exactly "1".
 VULNERABLE_MODE = os.environ.get("VULNERABLE_MODE") == "1"
 bearer = HTTPBearer(auto_error=False)
 

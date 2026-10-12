@@ -251,7 +251,7 @@ Assets (A1–A10) refer to section 2 and boundaries (TB1–TB6) to section 3.
 
 ### Planted vulnerabilities
 
-Three vulnerabilities from the course catalog and one arising from the composition of components will be planted deliberately. Each will be recorded against the threat ID whose control it weakens, and documented in the report.
+Three well-known weaknesses (CWE-862, CWE-89, CWE-20) and one arising from the composition of components will be planted deliberately. Each will be recorded against the threat ID whose control it weakens and documented in docs/known-vulnerabilities.md.
 
 ## 6. Phase plan
 
