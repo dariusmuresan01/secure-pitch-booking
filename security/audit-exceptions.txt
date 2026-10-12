@@ -1,0 +1,3 @@
+# Known dependency vulnerabilities accepted for this release.
+# One per line: <vulnerability id>  <justification>
+# Every entry must say why it is accepted and when it will be removed.
