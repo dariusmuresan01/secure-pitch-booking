@@ -226,7 +226,7 @@ missing variable, keeps the secure behaviour (fail-safe default).
 | V1 | CWE-862 Missing Authorization | `GET /schedules/{id}` |
 | V2 | CWE-89 SQL Injection | `GET /bookings?status=` |
 | V3 | CWE-20 Improper Input Validation | `POST /bookings` (date) |
-| V4 | Composition vulnerability | `api` → `schedule-service` → `booking-service` (operation 5) |
+| V4 | Composition vulnerability | `api` → `schedule-service` → `booking-service` (schedule generation) |
 
 Run the application and the tests in vulnerable mode:
 
