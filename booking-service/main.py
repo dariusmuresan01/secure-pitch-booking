@@ -187,6 +187,10 @@ def delete_pitch(pitch_id: int, user: dict = Depends(get_current_user)):
 def create_booking(booking: BookingCreate, user: dict = Depends(get_current_user)):
     if user["role"] != "player":
         raise HTTPException(status_code=403, detail="Only players can create bookings")
+        # V3 (CWE-20): the date is well-formed, but in vulnerable mode nobody checks
+    # that it makes sense for a booking, so players can book slots in the past.
+    if not VULNERABLE_MODE and booking.date < datetime.date.today():
+        raise HTTPException(status_code=422, detail="Bookings cannot be made for past dates")
     connection = get_connection()
     pitch = connection.execute(
         "SELECT id FROM pitches WHERE id = ?",
@@ -281,11 +285,21 @@ def get_job_bookings(job: dict = Depends(get_job_claims)):
         raise HTTPException(status_code=401, detail="Invalid or expired token")
     week_end = week_start + datetime.timedelta(days=6)
     connection = get_connection()
-    rows = connection.execute(
-        "SELECT id, pitch_id, date, start_hour FROM bookings "
-        "WHERE user_id = ? AND status = 'active' AND date BETWEEN ? AND ?",
-        (job["sub"], week_start.isoformat(), week_end.isoformat()),
-    ).fetchall()
+    if VULNERABLE_MODE:
+        # V4 (composition, threat T11): this endpoint is treated as a weekly feed
+        # for trusted internal jobs and only scopes by week. The Schedule service
+        # assumes the list is already limited to one player, so nobody filters by player.
+        rows = connection.execute(
+            "SELECT id, pitch_id, date, start_hour FROM bookings "
+            "WHERE status = 'active' AND date BETWEEN ? AND ?",
+            (week_start.isoformat(), week_end.isoformat()),
+        ).fetchall()
+    else:
+        rows = connection.execute(
+            "SELECT id, pitch_id, date, start_hour FROM bookings "
+            "WHERE user_id = ? AND status = 'active' AND date BETWEEN ? AND ?",
+            (job["sub"], week_start.isoformat(), week_end.isoformat()),
+        ).fetchall()
     connection.close()
     return [dict(row) for row in rows]
 
