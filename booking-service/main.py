@@ -135,10 +135,15 @@ def create_booking(booking:BookingCreate, user: dict = Depends(get_current_user)
 @app.get("/bookings")
 def get_bookings(user: dict = Depends(get_current_user)):
     connection = get_connection()
-    rows = connection.execute(
-        "SELECT id, pitch_id, user_id, date, start_hour, status FROM bookings WHERE user_id = ?",
-        (user["sub"],)
-    ).fetchall()
+    if user["role"] == "admin":
+        rows = connection.execute(
+            "SELECT id, pitch_id, user_id, date, start_hour, status FROM bookings"
+        ).fetchall()
+    else:
+        rows = connection.execute(
+            "SELECT id, pitch_id, user_id, date, start_hour, status FROM bookings WHERE user_id = ?",
+            (user["sub"],),
+        ).fetchall()
     connection.close()
     return [dict(row) for row in rows]
 
