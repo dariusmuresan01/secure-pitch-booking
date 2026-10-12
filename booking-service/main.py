@@ -142,9 +142,8 @@ def get_bookings(user: dict = Depends(get_current_user)):
     return [dict(row) for row in rows]
 
 
-# TODO: take user_id from the token, not from the query (threat T4); admin may cancel any booking
 @app.post("/bookings/{booking_id}/cancel")
-def cancel_booking(booking_id: int, user_id: str):
+def cancel_booking(booking_id: int, user: dict = Depends(get_current_user)):
     connection = get_connection()
     booking = connection.execute(
         "SELECT id, pitch_id, user_id, date, start_hour, status FROM bookings WHERE id = ?",
@@ -153,7 +152,7 @@ def cancel_booking(booking_id: int, user_id: str):
     if booking is None: 
         connection.close()
         raise HTTPException(status_code=404, detail="Booking not found")
-    if booking["user_id"] != user_id:
+    if booking["user_id"] != user["sub"] and user["role"] != "admin":
         connection.close()
         raise HTTPException(status_code=403, detail="Not allowed to cancel this booking")
     if booking["status"] != "active":
@@ -168,4 +167,3 @@ def cancel_booking(booking_id: int, user_id: str):
     result = dict(booking)
     result["status"] = "cancelled"
     return result
-
