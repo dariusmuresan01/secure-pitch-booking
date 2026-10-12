@@ -30,16 +30,18 @@ def get_current_user(
 ) -> dict:
     if credentials is None:
         raise HTTPException(status_code=401, detail="Not authenticated")
-    try: 
+    try:
         claims = jwt.decode(
             credentials.credentials,
             PUBLIC_KEY,
             algorithms=["EdDSA"],
             audience="booking-service",
             issuer="api",
-            options={"require": ["iss", "sub", "aud", "iat", "exp"]},
+            options={"require": ["iss", "sub", "aud", "iat", "exp", "token_use"]},
         )
     except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    if claims["token_use"] != "access":
         raise HTTPException(status_code=401, detail="Invalid or expired token")
     return claims
 

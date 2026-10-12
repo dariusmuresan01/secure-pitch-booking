@@ -54,9 +54,10 @@ def create_token(username: str, role: str) -> str:
         "iss": "api",
         "sub": username,
         "role": role,
+        "token_use": "access",
         "aud": ["booking-service"],
         "iat": now,
-        "exp": now + TOKEN_LIFETIME
+        "exp": now + TOKEN_LIFETIME,
     }
     return jwt.encode(claims, PRIVATE_KEY, algorithm="EdDSA")
 
@@ -67,15 +68,17 @@ def get_verified_token(
     if credentials is None:
         raise HTTPException(status_code=401, detail="Not authenticated")
     try:
-        jwt.decode(
+        claims = jwt.decode(
             credentials.credentials,
             PUBLIC_KEY,
             algorithms=["EdDSA"],
             audience="booking-service",
             issuer="api",
-            options={"require": ["iss", "sub", "aud", "iat", "exp"]}
+            options={"require": ["iss", "sub", "aud", "iat", "exp", "token_use"]},
         )
     except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    if claims["token_use"] != "access":
         raise HTTPException(status_code=401, detail="Invalid or expired token")
     return credentials.credentials
 
