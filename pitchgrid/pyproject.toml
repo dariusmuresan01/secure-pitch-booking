@@ -1,0 +1,10 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pitchgrid"
+version = "1.0.0"
+description = "Render a weekly pitch booking timetable as plain text"
+requires-python = ">=3.12"
+dependencies = []
