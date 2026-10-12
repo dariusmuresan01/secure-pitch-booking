@@ -22,7 +22,7 @@ connection.execute(
 # Synthetic test accounts only
 users = [
     ("darius", hasher.hash("darius-test-password"), "player"),
-    ("rui", hasher.hash("rui-test-password"), "player"),
+    ("andreea", hasher.hash("andreea-test-password"), "player"),
     ("admin", hasher.hash("admin-test-password"), "admin")
 ]
 

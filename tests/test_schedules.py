@@ -24,10 +24,10 @@ def request_schedule(client, headers, monday: datetime.date):
     return client.post("/schedules", headers=headers, json={"week_start": monday.isoformat()})
 
 
-def test_schedule_contains_only_own_active_bookings_of_that_week(client, darius, rui):
+def test_schedule_contains_only_own_active_bookings_of_that_week(client, darius, andreea):
     monday = random_monday()
     book(client, darius, monday, 10)                                   # included
-    book(client, rui, monday + datetime.timedelta(days=1), 11)         # other player
+    book(client, andreea, monday + datetime.timedelta(days=1), 11)         # other player
     cancelled = book(client, darius, monday + datetime.timedelta(days=2), 12)
     client.post(f"/bookings/{cancelled['id']}/cancel", headers=darius)  # cancelled
     book(client, darius, monday + datetime.timedelta(days=10), 13)     # next week
@@ -45,21 +45,21 @@ def test_schedule_contains_only_own_active_bookings_of_that_week(client, darius,
     assert schedule["week"] == monday.isoformat()
     assert content.startswith(f"Week of {monday.isoformat()} for darius")
     assert "Monday" in content and "10:00" in content
-    assert "Tuesday" not in content      # rui's booking stays out (T11)
+    assert "Tuesday" not in content      # andreea's booking stays out (T11)
     assert "Wednesday" not in content    # cancelled booking stays out
     assert "Thursday" not in content     # booking from the next week stays out
 
 
-def test_empty_week_gives_empty_schedule(client, rui):
-    created = request_schedule(client, rui, random_monday())
+def test_empty_week_gives_empty_schedule(client, andreea):
+    created = request_schedule(client, andreea, random_monday())
     assert created.status_code == 201
-    schedule = client.get(f"/schedules/{created.json()['schedule_id']}", headers=rui).json()
+    schedule = client.get(f"/schedules/{created.json()['schedule_id']}", headers=andreea).json()
     assert "No bookings" in schedule["content"]
 
 
-def test_other_player_cannot_download_schedule(client, darius, rui):
+def test_other_player_cannot_download_schedule(client, darius, andreea):
     schedule_id = request_schedule(client, darius, random_monday()).json()["schedule_id"]
-    response = client.get(f"/schedules/{schedule_id}", headers=rui)
+    response = client.get(f"/schedules/{schedule_id}", headers=andreea)
     assert response.status_code == 403
 
 

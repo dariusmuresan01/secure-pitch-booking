@@ -37,11 +37,11 @@ def test_v2_normal_status_filter_works(client, darius):
     assert {b["status"] for b in bookings} == {"active"}
 
 
-def test_v2_crafted_status_reads_other_players_bookings(client, darius, rui):
+def test_v2_crafted_status_reads_other_players_bookings(client, darius, andreea):
     book_for(client, darius)  # make sure another player has data to leak
 
-    # Rui is logged in, but sends SQL text instead of a status value.
-    response = client.get("/bookings", headers=rui, params={"status": "x' OR '1'='1"})
+    # Andreea is logged in, but sends SQL text instead of a status value.
+    response = client.get("/bookings", headers=andreea, params={"status": "x' OR '1'='1"})
 
     if VULNERABLE_MODE:
         assert response.status_code == 200

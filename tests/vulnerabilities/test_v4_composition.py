@@ -28,10 +28,10 @@ def book(client, headers, day: datetime.date, hour: int):
     assert response.status_code == 201, response.text
 
 
-def test_v4_schedule_leaks_other_players_bookings(client, darius, rui):
+def test_v4_schedule_leaks_other_players_bookings(client, darius, andreea):
     monday = random_monday()
     book(client, darius, monday, 10)                                # Darius: Monday 10:00
-    book(client, rui, monday + datetime.timedelta(days=1), 18)      # Rui: Tuesday 18:00
+    book(client, andreea, monday + datetime.timedelta(days=1), 18)      # Andreea: Tuesday 18:00
 
     # Darius asks for his own schedule: api -> schedule-service -> booking-service.
     created = client.post("/schedules", headers=darius, json={"week_start": monday.isoformat()})
@@ -41,6 +41,6 @@ def test_v4_schedule_leaks_other_players_bookings(client, darius, rui):
 
     assert "Monday" in content and "10:00" in content   # his own booking is always there
     if VULNERABLE_MODE:
-        assert "Tuesday" in content and "18:00" in content   # Rui's booking leaked
+        assert "Tuesday" in content and "18:00" in content   # Andreea's booking leaked
     else:
         assert "Tuesday" not in content

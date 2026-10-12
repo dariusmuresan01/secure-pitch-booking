@@ -76,10 +76,10 @@ def book(client, headers, day: datetime.date, hour: int) -> int:
     return response.json()["id"]
 
 
-def test_job_token_reads_only_its_player_and_week(client, darius, rui):
+def test_job_token_reads_only_its_player_and_week(client, darius, andreea):
     monday = random_monday()
     own = book(client, darius, monday, 10)
-    book(client, rui, monday, 11)
+    book(client, andreea, monday, 11)
     book(client, darius, monday + datetime.timedelta(days=8), 12)
 
     token = job_token(week=monday.isoformat())
@@ -108,7 +108,7 @@ def test_saved_schedule_owner_comes_from_job_token():
     response = httpx.post(
         f"{BOOKING_URL}/jobs/schedules",
         headers=bearer(token),
-        json={"content": "test", "owner_id": "rui", "week": "2099-01-05"},
+        json={"content": "test", "owner_id": "andreea", "week": "2099-01-05"},
     )
     assert response.status_code == 201
     assert response.json()["owner_id"] == "darius"

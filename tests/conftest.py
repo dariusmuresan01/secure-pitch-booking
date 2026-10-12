@@ -8,7 +8,7 @@ API_URL = os.environ.get("API_URL", "http://localhost:8000")
 # Synthetic test accounts, same as api/seed.py
 PASSWORDS = {
     "darius": "darius-test-password",
-    "rui": "rui-test-password",
+    "andreea": "andreea-test-password",
     "admin": "admin-test-password",
 }
 
@@ -35,8 +35,8 @@ def darius(client):
 
 
 @pytest.fixture
-def rui(client):
-    return auth_headers(client, "rui")
+def andreea(client):
+    return auth_headers(client, "andreea")
 
 
 @pytest.fixture

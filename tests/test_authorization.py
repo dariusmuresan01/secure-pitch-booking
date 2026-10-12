@@ -82,16 +82,16 @@ def test_player_can_book_free_slot(client, darius):
 
 
 def test_booking_owner_is_taken_from_token_not_body(client, darius):
-    body = free_slot() | {"user_id": "rui"}
+    body = free_slot() | {"user_id": "andreea"}
     response = client.post("/bookings", headers=darius, json=body)
     assert response.status_code == 201
     assert response.json()["user_id"] == "darius"
 
 
-def test_same_slot_cannot_be_booked_twice(client, darius, rui):
+def test_same_slot_cannot_be_booked_twice(client, darius, andreea):
     slot = free_slot()
     assert client.post("/bookings", headers=darius, json=slot).status_code == 201
-    assert client.post("/bookings", headers=rui, json=slot).status_code == 409
+    assert client.post("/bookings", headers=andreea, json=slot).status_code == 409
 
 
 def test_admin_cannot_create_booking(client, admin):
@@ -114,24 +114,24 @@ def test_malformed_booking_is_rejected(client, darius, body):
     assert response.status_code == 422
 
 
-def test_player_sees_only_own_bookings(client, darius, rui):
-    create_booking(client, rui)
+def test_player_sees_only_own_bookings(client, darius, andreea):
+    create_booking(client, andreea)
     bookings = client.get("/bookings", headers=darius).json()
     assert bookings
     assert {booking["user_id"] for booking in bookings} == {"darius"}
 
 
-def test_admin_sees_all_bookings(client, admin, darius, rui):
+def test_admin_sees_all_bookings(client, admin, darius, andreea):
     create_booking(client, darius)
-    create_booking(client, rui)
+    create_booking(client, andreea)
     bookings = client.get("/bookings", headers=admin).json()
-    assert {"darius", "rui"} <= {booking["user_id"] for booking in bookings}
+    assert {"darius", "andreea"} <= {booking["user_id"] for booking in bookings}
 
 
-def test_player_cannot_cancel_other_players_booking(client, darius, rui):
+def test_player_cannot_cancel_other_players_booking(client, darius, andreea):
     booking = create_booking(client, darius)
 
-    response = client.post(f"/bookings/{booking['id']}/cancel", headers=rui)
+    response = client.post(f"/bookings/{booking['id']}/cancel", headers=andreea)
     assert response.status_code == 403
 
     darius_bookings = client.get("/bookings", headers=darius).json()
@@ -148,8 +148,8 @@ def test_player_can_cancel_own_booking_once(client, darius):
     assert second.status_code == 409
 
 
-def test_admin_can_cancel_any_booking(client, admin, rui):
-    booking = create_booking(client, rui)
+def test_admin_can_cancel_any_booking(client, admin, andreea):
+    booking = create_booking(client, andreea)
     response = client.post(f"/bookings/{booking['id']}/cancel", headers=admin)
     assert response.status_code == 200
 

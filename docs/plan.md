@@ -18,7 +18,7 @@ A small system where players book football pitches in Brașov and view their own
 Seeded accounts (synthetic data, no registration):
 
 - `darius` (player)
-- `rui` (player)
+- `andreea` (player)
 - `admin` (admin)
 
 Two players are needed so that tests can show one player cannot reach the other player's bookings or schedules.

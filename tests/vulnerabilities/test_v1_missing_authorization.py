@@ -16,7 +16,7 @@ def random_monday() -> datetime.date:
     return first_monday + datetime.timedelta(weeks=random.randint(0, 400000))
 
 
-def test_v1_other_player_reads_schedule(client, darius, rui):
+def test_v1_other_player_reads_schedule(client, darius, andreea):
     # Darius creates a schedule that belongs to him.
     created = client.post(
         "/schedules", headers=darius, json={"week_start": random_monday().isoformat()}
@@ -24,8 +24,8 @@ def test_v1_other_player_reads_schedule(client, darius, rui):
     assert created.status_code == 201
     schedule_id = created.json()["schedule_id"]
 
-    # Rui is logged in, but asks for Darius's schedule id.
-    response = client.get(f"/schedules/{schedule_id}", headers=rui)
+    # Andreea is logged in, but asks for Darius's schedule id.
+    response = client.get(f"/schedules/{schedule_id}", headers=andreea)
 
     if VULNERABLE_MODE:
         assert response.status_code == 200

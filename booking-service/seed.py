@@ -63,7 +63,7 @@ pitches = [
 
 bookings = [
     (1, "darius", "2026-10-20", 20),
-    (1, "rui", "2026-10-24", 18)
+    (1, "andreea", "2026-10-24", 18)
 ]
 
 connection.executemany(

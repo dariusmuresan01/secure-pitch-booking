@@ -39,7 +39,7 @@ Seeded accounts (synthetic data, local use only):
 | Username | Role | Password |
 |---|---|---|
 | `darius` | player | `darius-test-password` |
-| `rui` | player | `rui-test-password` |
+| `andreea` | player | `andreea-test-password` |
 | `admin` | admin | `admin-test-password` |
 
 Operations exposed by the public API:
