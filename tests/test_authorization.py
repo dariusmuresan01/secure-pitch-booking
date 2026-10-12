@@ -7,7 +7,7 @@ import pytest
 def free_slot() -> dict:
     """A random future slot on pitch 2, so tests never collide with each other
     or with data left over from earlier runs."""
-    day = datetime.date(2030, 1, 1) + datetime.timedelta(days=random.randint(0, 20000))
+    day = datetime.date(2030, 1, 1) + datetime.timedelta(days=random.randint(0, 25000))
     return {"pitch_id": 2, "date": day.isoformat(), "start_hour": random.randint(10, 22)}
 
 

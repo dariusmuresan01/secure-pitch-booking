@@ -63,7 +63,7 @@ def bearer(token: str) -> dict:
 
 
 def random_monday() -> datetime.date:
-    return datetime.date(2030, 1, 7) + datetime.timedelta(weeks=random.randint(0, 3000))
+    return datetime.date(2100, 1, 4) + datetime.timedelta(weeks=random.randint(0, 400000))
 
 
 def book(client, headers, day: datetime.date, hour: int) -> int:

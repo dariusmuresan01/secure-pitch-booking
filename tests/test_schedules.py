@@ -6,8 +6,8 @@ import pytest
 
 def random_monday() -> datetime.date:
     """A random Monday far in the future, so every test gets an empty week."""
-    first_monday = datetime.date(2030, 1, 7)
-    return first_monday + datetime.timedelta(weeks=random.randint(0, 3000))
+    first_monday = datetime.date(2100, 1, 4)
+    return first_monday + datetime.timedelta(weeks=random.randint(0, 400000))
 
 
 def book(client, headers, day: datetime.date, hour: int) -> dict:
