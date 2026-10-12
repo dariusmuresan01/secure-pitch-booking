@@ -1,10 +1,12 @@
 import datetime
-import sqlite3
+import json
+import logging
 import os
+import sqlite3
 from pathlib import Path
 
 import jwt
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, Field
 
@@ -15,6 +17,29 @@ bearer = HTTPBearer(auto_error=False)
 app = FastAPI()
 
 
+logging.basicConfig(level=logging.INFO, format="%(message)s")
+audit_log = logging.getLogger("audit")
+
+
+@app.middleware("http")
+async def audit_requests(request: Request, call_next):
+    response = await call_next(request)
+    if request.method != "GET" or response.status_code in (401, 403):
+        audit_log.info(
+            json.dumps(
+                {
+                    "time": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                    "service": "booking-service",
+                    "actor": getattr(request.state, "actor", None),
+                    "method": request.method,
+                    "path": request.url.path,
+                    "status": response.status_code,
+                }
+            )
+        )
+    return response
+
+
 def get_connection():
     connection = sqlite3.connect(DATABASE)
     connection.row_factory = sqlite3.Row
@@ -23,6 +48,7 @@ def get_connection():
 
 
 def get_current_user(
+    request: Request,
     credentials: HTTPAuthorizationCredentials | None = Depends(bearer),
 ) -> dict:
     if credentials is None:
@@ -40,6 +66,7 @@ def get_current_user(
         raise HTTPException(status_code=401, detail="Invalid or expired token")
     if claims["token_use"] != "access":
         raise HTTPException(status_code=401, detail="Invalid or expired token")
+    request.state.actor = claims["sub"]
     return claims
 
 

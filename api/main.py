@@ -1,4 +1,6 @@
 import datetime
+import json
+import logging
 import sqlite3
 import os
 from pathlib import Path
@@ -22,6 +24,24 @@ bearer = HTTPBearer(auto_error=False)
 
 app = FastAPI()
 hasher = PasswordHasher()
+
+
+logging.basicConfig(level=logging.INFO, format="%(message)s")
+audit_log = logging.getLogger("audit")
+
+
+def audit(event: str, username: str, outcome: str) -> None:
+    audit_log.info(
+        json.dumps(
+            {
+                "time": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+                "service": "api",
+                "event": event,
+                "user": username,
+                "outcome": outcome,
+            }
+        )
+    )
 
 
 def get_connection():
@@ -49,9 +69,6 @@ class BookingCreate(BaseModel):
 
 class ScheduleRequest(BaseModel):
     week_start: datetime.date
-
-
-# ---------- Tokens ----------
 
 
 def create_token(username: str, role: str) -> str:
@@ -149,11 +166,14 @@ def login(credentials: LoginRequest):
     ).fetchone()
     connection.close()
     if user is None:
+        audit("login", credentials.username, "unknown_user")
         raise HTTPException(status_code=401, detail="Invalid username or password")
     try:
         hasher.verify(user["password_hash"], credentials.password)
     except VerifyMismatchError:
+        audit("login", credentials.username, "wrong_password")
         raise HTTPException(status_code=401, detail="Invalid username or password")
+    audit("login", user["username"], "success")
     token = create_token(user["username"], user["role"])
     return {"access_token": token, "token_type": "bearer"}
 
