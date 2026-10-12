@@ -6,6 +6,8 @@ connection.execute("DROP TABLE IF EXISTS bookings")
 
 connection.execute("DROP TABLE IF EXISTS pitches")
 
+connection.execute("DROP TABLE IF EXISTS schedules")
+
 connection.execute(
     """
     CREATE TABLE pitches (
@@ -30,6 +32,20 @@ connection.execute(
     )
     """
 )
+
+
+connection.execute(
+    """
+    CREATE TABLE schedules (
+        id INTEGER PRIMARY KEY,
+        owner_id TEXT NOT NULL,
+        week TEXT NOT NULL,
+        content TEXT NOT NULL CHECK (length(content) <= 10000),
+        created_at TEXT NOT NULL
+    )
+    """
+)
+
 
 connection.execute(
     """

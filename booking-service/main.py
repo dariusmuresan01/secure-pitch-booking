@@ -1,11 +1,11 @@
-import sqlite3
 import datetime
-import jwt
-
-from fastapi import FastAPI, HTTPException, Depends
-from pydantic import BaseModel, Field
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+import sqlite3
 from pathlib import Path
+
+import jwt
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from pydantic import BaseModel, Field
 
 DATABASE = "booking.db"
 PUBLIC_KEY = Path("../keys/public.pem").read_text()
@@ -21,12 +21,8 @@ def get_connection():
     return connection
 
 
-@app.get("/health")
-def health():
-    return {"status": "ok", "service": "booking-service"}
-
 def get_current_user(
-        credentials: HTTPAuthorizationCredentials | None = Depends(bearer),
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer),
 ) -> dict:
     if credentials is None:
         raise HTTPException(status_code=401, detail="Not authenticated")
@@ -44,6 +40,46 @@ def get_current_user(
     if claims["token_use"] != "access":
         raise HTTPException(status_code=401, detail="Invalid or expired token")
     return claims
+
+
+def get_job_claims(
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer),
+) -> dict:
+    if credentials is None:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    try:
+        claims = jwt.decode(
+            credentials.credentials,
+            PUBLIC_KEY,
+            algorithms=["EdDSA"],
+            audience="booking-service",
+            issuer="api",
+            options={
+                "require": ["iss", "sub", "aud", "iat", "exp", "token_use", "week", "scope"]
+            },
+        )
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    if claims["token_use"] != "job":
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    return claims
+
+
+class PitchCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=200)
+    address: str = Field(min_length=1, max_length=200)
+    price_per_hour: int = Field(gt=0, le=10000)
+
+
+class BookingCreate(BaseModel):
+    pitch_id: int = Field(gt=0)
+    date: datetime.date
+    start_hour: int = Field(ge=10, le=22)
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok", "service": "booking-service"}
 
 
 @app.get("/pitches")
@@ -69,20 +105,14 @@ def get_pitch(pitch_id: int, user: dict = Depends(get_current_user)):
     return dict(row)
 
 
-class PitchCreate(BaseModel):
-    name: str = Field(min_length=1, max_length=200)
-    address: str = Field(min_length=1, max_length=200)
-    price_per_hour: int = Field(gt=0, le=10000)
-
-
 @app.post("/pitches", status_code=201)
-def create_pitch(pitch:PitchCreate, user: dict = Depends(get_current_user)): 
+def create_pitch(pitch: PitchCreate, user: dict = Depends(get_current_user)):
     if user["role"] != "admin":
         raise HTTPException(status_code=403, detail="Only admins can add pitches")
     connection = get_connection()
     cursor = connection.execute(
         "INSERT INTO pitches (name, address, price_per_hour) VALUES (?, ?, ?)",
-        (pitch.name, pitch.address, pitch.price_per_hour)
+        (pitch.name, pitch.address, pitch.price_per_hour),
     )
     connection.commit()
     new_id = cursor.lastrowid
@@ -91,18 +121,36 @@ def create_pitch(pitch:PitchCreate, user: dict = Depends(get_current_user)):
         "id": new_id,
         "name": pitch.name,
         "address": pitch.address,
-        "price_per_hour": pitch.price_per_hour
+        "price_per_hour": pitch.price_per_hour,
     }
 
 
-class BookingCreate(BaseModel):
-    pitch_id: int = Field(gt=0)
-    date: datetime.date
-    start_hour: int = Field(gt=9, le=22)
+@app.delete("/pitches/{pitch_id}", status_code=204)
+def delete_pitch(pitch_id: int, user: dict = Depends(get_current_user)):
+    if user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Only admins can remove pitches")
+    connection = get_connection()
+    pitch = connection.execute(
+        "SELECT id FROM pitches WHERE id = ?",
+        (pitch_id,),
+    ).fetchone()
+    if pitch is None:
+        connection.close()
+        raise HTTPException(status_code=404, detail="Pitch not found")
+    try:
+        connection.execute(
+            "DELETE FROM pitches WHERE id = ?",
+            (pitch_id,),
+        )
+        connection.commit()
+    except sqlite3.IntegrityError:
+        connection.close()
+        raise HTTPException(status_code=409, detail="Pitch has bookings and cannot be removed")
+    connection.close()
 
 
 @app.post("/bookings", status_code=201)
-def create_booking(booking:BookingCreate, user: dict = Depends(get_current_user)):
+def create_booking(booking: BookingCreate, user: dict = Depends(get_current_user)):
     if user["role"] != "player":
         raise HTTPException(status_code=403, detail="Only players can create bookings")
     connection = get_connection()
@@ -113,10 +161,10 @@ def create_booking(booking:BookingCreate, user: dict = Depends(get_current_user)
     if pitch is None:
         connection.close()
         raise HTTPException(status_code=404, detail="Pitch not found")
-    try: 
+    try:
         cursor = connection.execute(
             "INSERT INTO bookings (pitch_id, user_id, date, start_hour) VALUES (?, ?, ?, ?)",
-            (booking.pitch_id, user["sub"], booking.date.isoformat(), booking.start_hour)
+            (booking.pitch_id, user["sub"], booking.date.isoformat(), booking.start_hour),
         )
         connection.commit()
     except sqlite3.IntegrityError:
@@ -130,7 +178,7 @@ def create_booking(booking:BookingCreate, user: dict = Depends(get_current_user)
         "user_id": user["sub"],
         "date": booking.date.isoformat(),
         "start_hour": booking.start_hour,
-        "status": "active"
+        "status": "active",
     }
 
 
@@ -157,7 +205,7 @@ def cancel_booking(booking_id: int, user: dict = Depends(get_current_user)):
         "SELECT id, pitch_id, user_id, date, start_hour, status FROM bookings WHERE id = ?",
         (booking_id,),
     ).fetchone()
-    if booking is None: 
+    if booking is None:
         connection.close()
         raise HTTPException(status_code=404, detail="Booking not found")
     if booking["user_id"] != user["sub"] and user["role"] != "admin":
@@ -177,25 +225,20 @@ def cancel_booking(booking_id: int, user: dict = Depends(get_current_user)):
     return result
 
 
-@app.delete("/pitches/{pitch_id}", status_code=204)
-def delete_pitch(pitch_id: int, user: dict = Depends(get_current_user)):
-    if user["role"] != "admin" :
-        raise HTTPException(status_code=403, detail="Only admins can remove pitches")
+@app.get("/jobs/bookings")
+def get_job_bookings(job: dict = Depends(get_job_claims)):
+    if "bookings:read" not in job["scope"]:
+        raise HTTPException(status_code=403, detail="Job is not allowed to read bookings")
+    try:
+        week_start = datetime.date.fromisoformat(job["week"])
+    except ValueError:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    week_end = week_start + datetime.timedelta(days=6)
     connection = get_connection()
-    pitch = connection.execute(
-        "SELECT id FROM pitches WHERE id = ?",
-        (pitch_id,),
-    ).fetchone()
-    if pitch is None:
-        connection.close()
-        raise HTTPException(status_code=404, detail="Pitch not found")
-    try: 
-        connection.execute(
-            "DELETE FROM pitches WHERE id = ?",
-            (pitch_id,),
-        )
-        connection.commit()
-    except sqlite3.IntegrityError:
-        connection.close()
-        raise HTTPException(status_code=409, detail="Pitch has bookings and cannot be removed")
+    rows = connection.execute(
+        "SELECT id, pitch_id, date, start_hour FROM bookings "
+        "WHERE user_id = ? AND status = 'active' AND date BETWEEN ? AND ?",
+        (job["sub"], week_start.isoformat(), week_end.isoformat()),
+    ).fetchall()
     connection.close()
+    return [dict(row) for row in rows]
