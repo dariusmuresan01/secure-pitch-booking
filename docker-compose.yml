@@ -1,0 +1,64 @@
+name: secure-pitch-booking
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - ./keys/private.pem:/run/keys/private.pem:ro
+      - ./keys/public.pem:/run/keys/public.pem:ro
+    networks:
+      - edge
+      - internal
+    depends_on:
+      - booking-service
+      - schedule-service
+    read_only: true
+    tmpfs:
+      - /data:uid=10001,gid=10001,mode=0700
+      - /tmp:mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+  booking-service:
+    build:
+      context: .
+      dockerfile: booking-service/Dockerfile
+    volumes:
+      - ./keys/public.pem:/run/keys/public.pem:ro
+    networks:
+      - internal
+    read_only: true
+    tmpfs:
+      - /data:uid=10001,gid=10001,mode=0700
+      - /tmp:mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+  schedule-service:
+    build:
+      context: .
+      dockerfile: schedule-service/Dockerfile
+    volumes:
+      - ./keys/public.pem:/run/keys/public.pem:ro
+    networks:
+      - internal
+    read_only: true
+    tmpfs:
+      - /tmp:mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  edge: {}
+  internal:
+    internal: true

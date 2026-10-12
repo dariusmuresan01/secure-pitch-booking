@@ -19,4 +19,4 @@ ENV DATABASE_PATH=/data/booking.db \
     PUBLIC_KEY_PATH=/run/keys/public.pem
 
 EXPOSE 8001
-CMD ["sh", "-c", "python seed.py && uvicorn main:app --host 0.0.0.0 --port 8001"]
+CMD ["sh", "-c", "python seed.py && exec uvicorn main:app --host 0.0.0.0 --port 8001"]
