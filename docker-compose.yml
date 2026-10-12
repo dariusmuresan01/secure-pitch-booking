@@ -57,6 +57,25 @@ services:
       - ALL
     security_opt:
       - no-new-privileges:true
+  tests:
+    profiles: ["test"]
+    build:
+      context: .
+      dockerfile: tests/Dockerfile
+    environment:
+      API_URL: http://api:8000
+      BOOKING_SERVICE_URL: http://booking-service:8001
+      SCHEDULE_SERVICE_URL: http://schedule-service:8002
+      PRIVATE_KEY_PATH: /run/keys/private.pem
+      INTERNAL_TESTS: "1"
+    volumes:
+      - ./keys/private.pem:/run/keys/private.pem:ro
+    networks:
+      - internal
+    depends_on:
+      - api
+      - booking-service
+      - schedule-service
 
 networks:
   edge: {}
