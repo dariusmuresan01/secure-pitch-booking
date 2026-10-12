@@ -77,6 +77,10 @@ class BookingCreate(BaseModel):
     start_hour: int = Field(ge=10, le=22)
 
 
+class ScheduleCreate(BaseModel):
+    content: str = Field(min_length=1, max_length=10000)
+
+
 @app.get("/health")
 def health():
     return {"status": "ok", "service": "booking-service"}
@@ -242,3 +246,34 @@ def get_job_bookings(job: dict = Depends(get_job_claims)):
     ).fetchall()
     connection.close()
     return [dict(row) for row in rows]
+
+
+@app.post("/jobs/schedules", status_code=201)
+def save_job_schedule(schedule: ScheduleCreate, job: dict = Depends(get_job_claims)):
+    if "schedules:write" not in job["scope"]:
+        raise HTTPException(status_code=403, detail="Job is not allowed to save schedules")
+    created_at = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    connection = get_connection()
+    cursor = connection.execute(
+        "INSERT INTO schedules (owner_id, week, content, created_at) VALUES (?, ?, ?, ?)",
+        (job["sub"], job["week"], schedule.content, created_at),
+    )
+    connection.commit()
+    new_id = cursor.lastrowid
+    connection.close()
+    return {"id": new_id, "owner_id": job["sub"], "week": job["week"]}
+
+
+@app.get("/schedules/{schedule_id}")
+def get_schedule(schedule_id: int, user: dict = Depends(get_current_user)):
+    connection = get_connection()
+    schedule = connection.execute(
+        "SELECT id, owner_id, week, content, created_at FROM schedules WHERE id = ?",
+        (schedule_id,),
+    ).fetchone()
+    connection.close()
+    if schedule is None:
+        raise HTTPException(status_code=404, detail="Schedule not found")
+    if schedule["owner_id"] != user["sub"]:
+        raise HTTPException(status_code=403, detail="Not allowed to view this schedule")
+    return dict(schedule)
