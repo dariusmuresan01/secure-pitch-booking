@@ -45,7 +45,7 @@ def get_current_user(
 
 
 @app.get("/pitches")
-def list_pitches():
+def list_pitches(user: dict = Depends(get_current_user)):
     connection = get_connection()
     rows = connection.execute(
         "SELECT id, name, address, price_per_hour FROM pitches"
@@ -55,7 +55,7 @@ def list_pitches():
 
 
 @app.get("/pitches/{pitch_id}")
-def get_pitch(pitch_id: int):
+def get_pitch(pitch_id: int, user: dict = Depends(get_current_user)):
     connection = get_connection()
     row = connection.execute(
         "SELECT id, name, address, price_per_hour FROM pitches WHERE id = ?",
@@ -73,9 +73,10 @@ class PitchCreate(BaseModel):
     price_per_hour: int = Field(gt=0, le=10000)
 
 
-# TODO: admin only (plan section 4)
 @app.post("/pitches", status_code=201)
-def create_pitch(pitch:PitchCreate): 
+def create_pitch(pitch:PitchCreate, user: dict = Depends(get_current_user)): 
+    if user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="Only admins can add pitches")
     connection = get_connection()
     cursor = connection.execute(
         "INSERT INTO pitches (name, address, price_per_hour) VALUES (?, ?, ?)",
