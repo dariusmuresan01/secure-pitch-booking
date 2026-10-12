@@ -108,6 +108,19 @@ pipeline {
                 '''
             }
         }
+
+        stage('8. Vulnerability demonstration') {
+            steps {
+                sh '''
+                    docker compose $COMPOSE_FILES --profile test down -v --remove-orphans
+                    docker compose $COMPOSE_FILES -f docker-compose.vulnerable.yml up -d --wait
+                    docker compose $COMPOSE_FILES -f docker-compose.vulnerable.yml --profile test run --rm tests \
+                        pytest -v -p no:cacheprovider vulnerabilities \
+                        --junitxml=/reports/junit-vulnerable.xml
+                '''
+            }
+        }
+
     }
 
     post {
