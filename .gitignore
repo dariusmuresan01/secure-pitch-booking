@@ -6,3 +6,4 @@ __pycache__/
 keys/
 build/
 *.egg-info/
+.pytest_cache/
