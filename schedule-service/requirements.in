@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+pydantic
+httpx
+pyjwt[crypto]
+pitchgrid==1.0.0
