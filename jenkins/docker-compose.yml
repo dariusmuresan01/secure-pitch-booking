@@ -1,0 +1,14 @@
+name: jenkins
+
+services:
+  jenkins:
+    build: .
+    user: root
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      JENKINS_HOME: ${HOME}/jenkins-home
+    volumes:
+      - ${HOME}/jenkins-home:${HOME}/jenkins-home
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
