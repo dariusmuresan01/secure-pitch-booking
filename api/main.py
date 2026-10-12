@@ -36,6 +36,18 @@ class LoginRequest(BaseModel):
     password: str = Field(min_length=1, max_length=200)
 
 
+class PitchCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=200)
+    address: str = Field(min_length=1, max_length=200)
+    price_per_hour: int = Field(gt=0, le=10000)
+
+
+class BookingCreate(BaseModel):
+    pitch_id: int = Field(gt=0)
+    date: datetime.date
+    start_hour: int = Field(ge=10, le=22)
+
+
 def create_token(username: str, role: str) -> str:
     now = datetime.datetime.now(datetime.timezone.utc)
     claims = {
@@ -108,3 +120,33 @@ def login(credentials: LoginRequest):
 @app.get("/pitches")
 def list_pitches(token: str = Depends(get_verified_token)):
     return forward("GET", "/pitches", token)
+
+
+@app.get("/pitches/{pitch_id}")
+def get_pitch(pitch_id: int, token: str = Depends(get_verified_token)):
+    return forward("GET", f"/pitches/{pitch_id}", token)
+
+
+@app.post("/pitches")
+def create_pitch(pitch: PitchCreate, token: str = Depends(get_verified_token)):
+    return forward("POST", "/pitches", token, pitch.model_dump(mode="json"))
+
+
+@app.delete("/pitches/{pitch_id}")
+def delete_pitch(pitch_id: int, token: str = Depends(get_verified_token)):
+    return forward("DELETE", f"/pitches/{pitch_id}", token)
+
+
+@app.post("/bookings")
+def create_booking(booking: BookingCreate, token: str = Depends(get_verified_token)):
+    return forward("POST", "/bookings", token, booking.model_dump(mode="json"))
+
+
+@app.get("/bookings")
+def get_bookings(token: str = Depends(get_verified_token)):
+    return forward("GET", "/bookings", token)
+
+
+@app.post("/bookings/{booking_id}/cancel")
+def cancel_booking(booking_id: int, token: str = Depends(get_verified_token)):
+    return forward("POST", f"/bookings/{booking_id}/cancel", token)
