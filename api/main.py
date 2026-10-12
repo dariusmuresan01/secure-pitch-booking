@@ -134,13 +134,16 @@ def get_verified_claims(
     return verify_access_token(credentials.credentials)
 
 
-def forward(method: str, path: str, token: str, body: dict | None = None) -> Response:
+def forward(
+    method: str, path: str, token: str, body: dict | None = None, params: dict | None = None
+) -> Response:
     try:
         response = httpx.request(
             method,
             BOOKING_SERVICE_URL + path,
             headers={"Authorization": f"Bearer {token}"},
             json=body,
+            params=params,
             timeout=5.0,
         )
     except httpx.RequestError:
@@ -204,8 +207,9 @@ def create_booking(booking: BookingCreate, token: str = Depends(get_verified_tok
 
 
 @app.get("/bookings")
-def get_bookings(token: str = Depends(get_verified_token)):
-    return forward("GET", "/bookings", token)
+def get_bookings(status: str | None = None, token: str = Depends(get_verified_token)):
+    params = {"status": status} if status is not None else None
+    return forward("GET", "/bookings", token, params=params)
 
 
 @app.post("/bookings/{booking_id}/cancel")

@@ -12,6 +12,8 @@ from pydantic import BaseModel, Field
 
 DATABASE = os.environ.get("DATABASE_PATH", "booking.db")
 PUBLIC_KEY = Path(os.environ.get("PUBLIC_KEY_PATH", "../keys/public.pem")).read_text()
+# Intentional vulnerabilities for the assignment. Secure unless exactly "1".
+VULNERABLE_MODE = os.environ.get("VULNERABLE_MODE") == "1"
 bearer = HTTPBearer(auto_error=False)
 
 app = FastAPI()
@@ -214,18 +216,30 @@ def create_booking(booking: BookingCreate, user: dict = Depends(get_current_user
     }
 
 
+ALLOWED_STATUSES = {"active", "cancelled"}
+
+
 @app.get("/bookings")
-def get_bookings(user: dict = Depends(get_current_user)):
+def get_bookings(status: str | None = None, user: dict = Depends(get_current_user)):
+    if status is not None and not VULNERABLE_MODE and status not in ALLOWED_STATUSES:
+        raise HTTPException(status_code=422, detail="Unknown booking status")
+
+    sql = "SELECT id, pitch_id, user_id, date, start_hour, status FROM bookings WHERE 1 = 1"
+    params = []
+    if user["role"] != "admin":
+        sql += " AND user_id = ?"
+        params.append(user["sub"])
+    if status is not None:
+        if VULNERABLE_MODE:
+            # V2 (CWE-89, threat T6): the status text is pasted into the SQL
+            # command, so a crafted value can change what the query means.
+            sql += " AND status = '" + status + "'"
+        else:
+            sql += " AND status = ?"
+            params.append(status)
+
     connection = get_connection()
-    if user["role"] == "admin":
-        rows = connection.execute(
-            "SELECT id, pitch_id, user_id, date, start_hour, status FROM bookings"
-        ).fetchall()
-    else:
-        rows = connection.execute(
-            "SELECT id, pitch_id, user_id, date, start_hour, status FROM bookings WHERE user_id = ?",
-            (user["sub"],),
-        ).fetchall()
+    rows = connection.execute(sql, params).fetchall()
     connection.close()
     return [dict(row) for row in rows]
 
@@ -302,6 +316,8 @@ def get_schedule(schedule_id: int, user: dict = Depends(get_current_user)):
     connection.close()
     if schedule is None:
         raise HTTPException(status_code=404, detail="Schedule not found")
-    if schedule["owner_id"] != user["sub"]:
+    # V1 (CWE-862, threat T10): in vulnerable mode the ownership check is skipped,
+    # so any logged-in user can read any schedule by guessing its id.
+    if not VULNERABLE_MODE and schedule["owner_id"] != user["sub"]:
         raise HTTPException(status_code=403, detail="Not allowed to view this schedule")
     return dict(schedule)

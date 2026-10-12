@@ -1,0 +1,9 @@
+# Switches ON the intentional vulnerabilities for the assignment demo.
+# Used only on top of docker-compose.yml. Never use it outside the demo.
+services:
+  booking-service:
+    environment:
+      VULNERABLE_MODE: "1"
+  tests:
+    environment:
+      VULNERABLE_MODE: "1"
