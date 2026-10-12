@@ -1,28 +1,26 @@
-import sqlite3
 import datetime
-import jwt
-import httpx
-
+import sqlite3
 from pathlib import Path
-from fastapi import FastAPI, HTTPException, Depends, Response
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from pydantic import BaseModel, Field
+
+import httpx
+import jwt
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
+from fastapi import Depends, FastAPI, HTTPException, Response
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from pydantic import BaseModel, Field
 
 DATABASE = "users.db"
 PRIVATE_KEY = Path("../keys/private.pem").read_text()
-TOKEN_LIFETIME = datetime.timedelta(minutes=15)
 PUBLIC_KEY = Path("../keys/public.pem").read_text()
+TOKEN_LIFETIME = datetime.timedelta(minutes=15)
+JOB_TOKEN_LIFETIME = datetime.timedelta(minutes=2)
 BOOKING_SERVICE_URL = "http://localhost:8001"
+SCHEDULE_SERVICE_URL = "http://localhost:8002"
 bearer = HTTPBearer(auto_error=False)
 
 app = FastAPI()
 hasher = PasswordHasher()
-
-@app.get("/health")
-def health():
-    return {"status": "ok", "service": "api"}
 
 
 def get_connection():
@@ -32,7 +30,7 @@ def get_connection():
 
 
 class LoginRequest(BaseModel):
-    username: str = Field(min_length=1, max_length=200)
+    username: str = Field(min_length=1, max_length=50)
     password: str = Field(min_length=1, max_length=200)
 
 
@@ -46,6 +44,13 @@ class BookingCreate(BaseModel):
     pitch_id: int = Field(gt=0)
     date: datetime.date
     start_hour: int = Field(ge=10, le=22)
+
+
+class ScheduleRequest(BaseModel):
+    week_start: datetime.date
+
+
+# ---------- Tokens ----------
 
 
 def create_token(username: str, role: str) -> str:
@@ -62,14 +67,25 @@ def create_token(username: str, role: str) -> str:
     return jwt.encode(claims, PRIVATE_KEY, algorithm="EdDSA")
 
 
-def get_verified_token(
-        credentials: HTTPAuthorizationCredentials | None = Depends(bearer),
-) -> str:
-    if credentials is None:
-        raise HTTPException(status_code=401, detail="Not authenticated")
+def create_job_token(username: str, week: str) -> str:
+    now = datetime.datetime.now(datetime.timezone.utc)
+    claims = {
+        "iss": "api",
+        "sub": username,
+        "token_use": "job",
+        "aud": ["schedule-service", "booking-service"],
+        "week": week,
+        "scope": ["bookings:read", "schedules:write"],
+        "iat": now,
+        "exp": now + JOB_TOKEN_LIFETIME,
+    }
+    return jwt.encode(claims, PRIVATE_KEY, algorithm="EdDSA")
+
+
+def verify_access_token(token: str) -> dict:
     try:
         claims = jwt.decode(
-            credentials.credentials,
+            token,
             PUBLIC_KEY,
             algorithms=["EdDSA"],
             audience="booking-service",
@@ -80,7 +96,24 @@ def get_verified_token(
         raise HTTPException(status_code=401, detail="Invalid or expired token")
     if claims["token_use"] != "access":
         raise HTTPException(status_code=401, detail="Invalid or expired token")
+    return claims
+
+
+def get_verified_token(
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer),
+) -> str:
+    if credentials is None:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    verify_access_token(credentials.credentials)
     return credentials.credentials
+
+
+def get_verified_claims(
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer),
+) -> dict:
+    if credentials is None:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    return verify_access_token(credentials.credentials)
 
 
 def forward(method: str, path: str, token: str, body: dict | None = None) -> Response:
@@ -90,15 +123,20 @@ def forward(method: str, path: str, token: str, body: dict | None = None) -> Res
             BOOKING_SERVICE_URL + path,
             headers={"Authorization": f"Bearer {token}"},
             json=body,
-            timeout=5.0
+            timeout=5.0,
         )
     except httpx.RequestError:
         raise HTTPException(status_code=502, detail="Booking service unavailable")
     return Response(
         content=response.content,
         status_code=response.status_code,
-        media_type=response.headers.get("content-type")
+        media_type=response.headers.get("content-type"),
     )
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok", "service": "api"}
 
 
 @app.post("/login")
@@ -106,12 +144,11 @@ def login(credentials: LoginRequest):
     connection = get_connection()
     user = connection.execute(
         "SELECT username, password_hash, role FROM users WHERE username = ?",
-        (credentials.username,)
+        (credentials.username,),
     ).fetchone()
     connection.close()
     if user is None:
         raise HTTPException(status_code=401, detail="Invalid username or password")
-    
     try:
         hasher.verify(user["password_hash"], credentials.password)
     except VerifyMismatchError:
@@ -153,3 +190,28 @@ def get_bookings(token: str = Depends(get_verified_token)):
 @app.post("/bookings/{booking_id}/cancel")
 def cancel_booking(booking_id: int, token: str = Depends(get_verified_token)):
     return forward("POST", f"/bookings/{booking_id}/cancel", token)
+
+
+@app.post("/schedules", status_code=201)
+def request_schedule(request: ScheduleRequest, user: dict = Depends(get_verified_claims)):
+    if user["role"] != "player":
+        raise HTTPException(status_code=403, detail="Only players can request schedules")
+    if request.week_start.weekday() != 0:
+        raise HTTPException(status_code=422, detail="week_start must be a Monday")
+    job_token = create_job_token(user["sub"], request.week_start.isoformat())
+    try:
+        response = httpx.post(
+            f"{SCHEDULE_SERVICE_URL}/jobs",
+            headers={"Authorization": f"Bearer {job_token}"},
+            timeout=10.0,
+        )
+    except httpx.RequestError:
+        raise HTTPException(status_code=502, detail="Schedule service unavailable")
+    if response.status_code != 201:
+        raise HTTPException(status_code=502, detail="Could not create schedule")
+    return {"schedule_id": response.json()["schedule_id"]}
+
+
+@app.get("/schedules/{schedule_id}")
+def get_schedule(schedule_id: int, token: str = Depends(get_verified_token)):
+    return forward("GET", f"/schedules/{schedule_id}", token)
