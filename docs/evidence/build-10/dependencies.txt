@@ -1,0 +1,5 @@
+ok  api/requirements.txt: every dependency pinned with a hash
+ok  booking-service/requirements.txt: every dependency pinned with a hash
+ok  schedule-service/requirements.txt: every dependency pinned with a hash
+ok  tests/requirements.txt: every dependency pinned with a hash
+ok  pitchgrid-1.0.0-py3-none-any.whl  sha256:2fdeefc22f83ac2ff275fc08257e2471d69c6ba79dbd6a0a036e4c162c7218f0

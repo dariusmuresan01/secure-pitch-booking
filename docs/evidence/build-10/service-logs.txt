@@ -1,0 +1,396 @@
+booking-service-1  | Seeded 2 pitches with bookings
+booking-service-1  | INFO:     Started server process [1]
+booking-service-1  | INFO:     Waiting for application startup.
+booking-service-1  | INFO:     Application startup complete.
+booking-service-1  | INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
+booking-service-1  | INFO:     127.0.0.1:40888 - "GET /health HTTP/1.1" 200 OK
+schedule-service-1  | INFO:     Started server process [1]
+schedule-service-1  | INFO:     Waiting for application startup.
+schedule-service-1  | INFO:     Application startup complete.
+schedule-service-1  | INFO:     Uvicorn running on http://0.0.0.0:8002 (Press CTRL+C to quit)
+schedule-service-1  | INFO:     127.0.0.1:53716 - "GET /health HTTP/1.1" 200 OK
+schedule-service-1  | INFO:     127.0.0.1:59462 - "GET /health HTTP/1.1" 200 OK
+schedule-service-1  | INFO:     172.19.0.5:41956 - "POST /jobs HTTP/1.1" 401 Unauthorized
+schedule-service-1  | INFO:     172.19.0.5:41964 - "POST /jobs HTTP/1.1" 401 Unauthorized
+schedule-service-1  | INFO:     172.19.0.5:41966 - "POST /jobs HTTP/1.1" 401 Unauthorized
+schedule-service-1  | INFO:     127.0.0.1:59476 - "GET /health HTTP/1.1" 200 OK
+schedule-service-1  | INFO:     172.19.0.4:48750 - "POST /jobs HTTP/1.1" 201 Created
+schedule-service-1  | INFO:     172.19.0.4:48754 - "POST /jobs HTTP/1.1" 201 Created
+schedule-service-1  | INFO:     172.19.0.4:48764 - "POST /jobs HTTP/1.1" 201 Created
+schedule-service-1  | INFO:     172.19.0.4:48770 - "POST /jobs HTTP/1.1" 201 Created
+schedule-service-1  | INFO:     172.19.0.4:48782 - "POST /jobs HTTP/1.1" 201 Created
+schedule-service-1  | INFO:     172.19.0.4:48790 - "POST /jobs HTTP/1.1" 201 Created
+booking-service-1   | INFO:     127.0.0.1:52364 - "GET /health HTTP/1.1" 200 OK
+booking-service-1   | INFO:     172.19.0.4:48220 - "POST /bookings HTTP/1.1" 201 Created
+booking-service-1   | {"time": "2026-10-12T23:41:00.367148+00:00", "service": "booking-service", "actor": "darius", "method": "POST", "path": "/bookings", "status": 201}
+booking-service-1   | INFO:     172.19.0.4:48228 - "POST /bookings HTTP/1.1" 201 Created
+booking-service-1   | {"time": "2026-10-12T23:41:00.375567+00:00", "service": "booking-service", "actor": "andreea", "method": "POST", "path": "/bookings", "status": 201}
+booking-service-1   | INFO:     172.19.0.4:48240 - "POST /bookings HTTP/1.1" 201 Created
+booking-service-1   | {"time": "2026-10-12T23:41:00.383007+00:00", "service": "booking-service", "actor": "darius", "method": "POST", "path": "/bookings", "status": 201}
+booking-service-1   | INFO:     172.19.0.5:49250 - "GET /jobs/bookings HTTP/1.1" 200 OK
+booking-service-1   | INFO:     172.19.0.5:49258 - "GET /jobs/bookings HTTP/1.1" 403 Forbidden
+booking-service-1   | {"time": "2026-10-12T23:41:00.402087+00:00", "service": "booking-service", "actor": null, "method": "GET", "path": "/jobs/bookings", "status": 403}
+booking-service-1   | INFO:     172.19.0.5:49270 - "POST /jobs/schedules HTTP/1.1" 403 Forbidden
+booking-service-1   | {"time": "2026-10-12T23:41:00.409389+00:00", "service": "booking-service", "actor": null, "method": "POST", "path": "/jobs/schedules", "status": 403}
+booking-service-1   | INFO:     172.19.0.5:49274 - "POST /jobs/schedules HTTP/1.1" 201 Created
+booking-service-1   | {"time": "2026-10-12T23:41:00.416739+00:00", "service": "booking-service", "actor": null, "method": "POST", "path": "/jobs/schedules", "status": 201}
+booking-service-1   | INFO:     172.19.0.5:49286 - "POST /jobs/schedules HTTP/1.1" 422 Unprocessable Content
+booking-service-1   | {"time": "2026-10-12T23:41:00.423854+00:00", "service": "booking-service", "actor": null, "method": "POST", "path": "/jobs/schedules", "status": 422}
+booking-service-1   | {"time": "2026-10-12T23:41:00.430799+00:00", "service": "booking-service", "actor": null, "method": "GET", "path": "/jobs/bookings", "status": 401}
+booking-service-1   | INFO:     172.19.0.5:49302 - "GET /jobs/bookings HTTP/1.1" 401 Unauthorized
+booking-service-1   | {"time": "2026-10-12T23:41:00.446849+00:00", "service": "booking-service", "actor": null, "method": "GET", "path": "/jobs/bookings", "status": 401}
+booking-service-1   | INFO:     172.19.0.5:49308 - "GET /jobs/bookings HTTP/1.1" 401 Unauthorized
+booking-service-1   | {"time": "2026-10-12T23:41:00.460713+00:00", "service": "booking-service", "actor": null, "method": "GET", "path": "/bookings", "status": 401}
+booking-service-1   | INFO:     172.19.0.5:49314 - "GET /bookings HTTP/1.1" 401 Unauthorized
+booking-service-1   | {"time": "2026-10-12T23:41:00.524283+00:00", "service": "booking-service", "actor": null, "method": "GET", "path": "/jobs/bookings", "status": 401}
+booking-service-1   | INFO:     172.19.0.5:49330 - "GET /jobs/bookings HTTP/1.1" 401 Unauthorized
+booking-service-1   | {"time": "2026-10-12T23:41:00.596467+00:00", "service": "booking-service", "actor": null, "method": "GET", "path": "/bookings", "status": 401}
+booking-service-1   | INFO:     172.19.0.5:49336 - "GET /bookings HTTP/1.1" 401 Unauthorized
+booking-service-1   | INFO:     172.19.0.4:48248 - "GET /pitches HTTP/1.1" 200 OK
+booking-service-1   | INFO:     172.19.0.4:48260 - "POST /pitches HTTP/1.1" 403 Forbidden
+booking-service-1   | {"time": "2026-10-12T23:41:00.925443+00:00", "service": "booking-service", "actor": "darius", "method": "POST", "path": "/pitches", "status": 403}
+booking-service-1   | INFO:     172.19.0.4:48264 - "POST /pitches HTTP/1.1" 201 Created
+booking-service-1   | {"time": "2026-10-12T23:41:01.048295+00:00", "service": "booking-service", "actor": "admin", "method": "POST", "path": "/pitches", "status": 201}
+booking-service-1   | INFO:     172.19.0.4:48272 - "DELETE /pitches/3 HTTP/1.1" 403 Forbidden
+booking-service-1   | {"time": "2026-10-12T23:41:01.055849+00:00", "service": "booking-service", "actor": "darius", "method": "DELETE", "path": "/pitches/3", "status": 403}
+booking-service-1   | INFO:     172.19.0.4:48276 - "GET /pitches/3 HTTP/1.1" 200 OK
+booking-service-1   | INFO:     172.19.0.4:48290 - "DELETE /pitches/3 HTTP/1.1" 204 No Content
+booking-service-1   | {"time": "2026-10-12T23:41:01.069917+00:00", "service": "booking-service", "actor": "admin", "method": "DELETE", "path": "/pitches/3", "status": 204}
+booking-service-1   | {"time": "2026-10-12T23:41:01.193909+00:00", "service": "booking-service", "actor": "darius", "method": "POST", "path": "/bookings", "status": 201}
+booking-service-1   | INFO:     172.19.0.4:48294 - "POST /bookings HTTP/1.1" 201 Created
+booking-service-1   | INFO:     172.19.0.4:48304 - "DELETE /pitches/2 HTTP/1.1" 409 Conflict
+booking-service-1   | {"time": "2026-10-12T23:41:01.202350+00:00", "service": "booking-service", "actor": "admin", "method": "DELETE", "path": "/pitches/2", "status": 409}
+booking-service-1   | INFO:     172.19.0.4:48314 - "POST /bookings HTTP/1.1" 201 Created
+booking-service-1   | {"time": "2026-10-12T23:41:01.268390+00:00", "service": "booking-service", "actor": "darius", "method": "POST", "path": "/bookings", "status": 201}
+booking-service-1   | {"time": "2026-10-12T23:41:01.333019+00:00", "service": "booking-service", "actor": "darius", "method": "POST", "path": "/bookings", "status": 201}
+booking-service-1   | INFO:     172.19.0.4:48326 - "POST /bookings HTTP/1.1" 201 Created
+booking-service-1   | {"time": "2026-10-12T23:41:01.458706+00:00", "service": "booking-service", "actor": "darius", "method": "POST", "path": "/bookings", "status": 201}
+booking-service-1   | INFO:     172.19.0.4:48330 - "POST /bookings HTTP/1.1" 201 Created
+booking-service-1   | {"time": "2026-10-12T23:41:01.467913+00:00", "service": "booking-service", "actor": "andreea", "method": "POST", "path": "/bookings", "status": 409}
+booking-service-1   | INFO:     172.19.0.4:48340 - "POST /bookings HTTP/1.1" 409 Conflict
+booking-service-1   | {"time": "2026-10-12T23:41:01.535698+00:00", "service": "booking-service", "actor": "admin", "method": "POST", "path": "/bookings", "status": 403}
+booking-service-1   | INFO:     172.19.0.4:48342 - "POST /bookings HTTP/1.1" 403 Forbidden
+booking-service-1   | INFO:     127.0.0.1:52368 - "GET /health HTTP/1.1" 200 OK
+booking-service-1   | {"time": "2026-10-12T23:41:01.968254+00:00", "service": "booking-service", "actor": "andreea", "method": "POST", "path": "/bookings", "status": 201}
+booking-service-1   | INFO:     172.19.0.4:48346 - "POST /bookings HTTP/1.1" 201 Created
+booking-service-1   | INFO:     172.19.0.4:48362 - "GET /bookings HTTP/1.1" 200 OK
+booking-service-1   | {"time": "2026-10-12T23:41:02.154571+00:00", "service": "booking-service", "actor": "darius", "method": "POST", "path": "/bookings", "status": 201}
+booking-service-1   | INFO:     172.19.0.4:48370 - "POST /bookings HTTP/1.1" 201 Created
+booking-service-1   | {"time": "2026-10-12T23:41:02.162445+00:00", "service": "booking-service", "actor": "andreea", "method": "POST", "path": "/bookings", "status": 201}
+booking-service-1   | INFO:     172.19.0.4:48372 - "POST /bookings HTTP/1.1" 201 Created
+booking-service-1   | INFO:     172.19.0.4:48380 - "GET /bookings HTTP/1.1" 200 OK
+booking-service-1   | INFO:     172.19.0.4:48392 - "POST /bookings HTTP/1.1" 201 Created
+api-1              | Seeded 3 accounts
+api-1               | INFO:     Started server process [1]
+api-1               | INFO:     Waiting for application startup.
+api-1               | INFO:     Application startup complete.
+api-1               | INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+api-1               | INFO:     127.0.0.1:56972 - "GET /health HTTP/1.1" 200 OK
+api-1               | {"time": "2026-10-12T23:41:00.274472+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | {"time": "2026-10-12T23:41:00.333732+00:00", "service": "api", "event": "login", "user": "andreea", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | HTTP Request: POST http://booking-service:8001/bookings "HTTP/1.1 201 Created"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 201 Created
+api-1               | HTTP Request: POST http://booking-service:8001/bookings "HTTP/1.1 201 Created"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 201 Created
+api-1               | HTTP Request: POST http://booking-service:8001/bookings "HTTP/1.1 201 Created"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 201 Created
+api-1               | {"time": "2026-10-12T23:41:00.517007+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | {"time": "2026-10-12T23:41:00.580273+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | INFO:     172.19.0.5:36448 - "GET /health HTTP/1.1" 200 OK
+api-1               | {"time": "2026-10-12T23:41:00.654110+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | {"time": "2026-10-12T23:41:00.714811+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "wrong_password"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 401 Unauthorized
+api-1               | {"time": "2026-10-12T23:41:00.716502+00:00", "service": "api", "event": "login", "user": "nobody", "outcome": "unknown_user"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 401 Unauthorized
+api-1               | INFO:     172.19.0.5:36448 - "GET /pitches HTTP/1.1" 401 Unauthorized
+api-1               | {"time": "2026-10-12T23:41:00.774333+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | INFO:     172.19.0.5:36448 - "GET /bookings HTTP/1.1" 401 Unauthorized
+api-1               | INFO:     172.19.0.5:36448 - "GET /pitches HTTP/1.1" 401 Unauthorized
+api-1               | INFO:     172.19.0.5:36448 - "GET /pitches/1 HTTP/1.1" 401 Unauthorized
+api-1               | INFO:     172.19.0.5:36448 - "POST /pitches HTTP/1.1" 401 Unauthorized
+api-1               | INFO:     172.19.0.5:36448 - "DELETE /pitches/1 HTTP/1.1" 401 Unauthorized
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 401 Unauthorized
+api-1               | INFO:     172.19.0.5:36448 - "GET /bookings HTTP/1.1" 401 Unauthorized
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings/1/cancel HTTP/1.1" 401 Unauthorized
+api-1               | INFO:     172.19.0.5:36448 - "POST /schedules HTTP/1.1" 401 Unauthorized
+api-1               | INFO:     172.19.0.5:36448 - "GET /schedules/1 HTTP/1.1" 401 Unauthorized
+api-1               | {"time": "2026-10-12T23:41:00.850222+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | HTTP Request: GET http://booking-service:8001/pitches "HTTP/1.1 200 OK"
+api-1               | INFO:     172.19.0.5:36448 - "GET /pitches HTTP/1.1" 200 OK
+api-1               | {"time": "2026-10-12T23:41:00.914965+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | HTTP Request: POST http://booking-service:8001/pitches "HTTP/1.1 403 Forbidden"
+api-1               | INFO:     172.19.0.5:36448 - "POST /pitches HTTP/1.1" 403 Forbidden
+api-1               | {"time": "2026-10-12T23:41:00.983501+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | {"time": "2026-10-12T23:41:01.039911+00:00", "service": "api", "event": "login", "user": "admin", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | HTTP Request: POST http://booking-service:8001/pitches "HTTP/1.1 201 Created"
+api-1               | INFO:     172.19.0.5:36448 - "POST /pitches HTTP/1.1" 201 Created
+api-1               | HTTP Request: DELETE http://booking-service:8001/pitches/3 "HTTP/1.1 403 Forbidden"
+api-1               | INFO:     172.19.0.5:36448 - "DELETE /pitches/3 HTTP/1.1" 403 Forbidden
+api-1               | HTTP Request: GET http://booking-service:8001/pitches/3 "HTTP/1.1 200 OK"
+api-1               | INFO:     172.19.0.5:36448 - "GET /pitches/3 HTTP/1.1" 200 OK
+api-1               | HTTP Request: DELETE http://booking-service:8001/pitches/3 "HTTP/1.1 204 No Content"
+api-1               | INFO:     172.19.0.5:36448 - "DELETE /pitches/3 HTTP/1.1" 204 No Content
+api-1               | {"time": "2026-10-12T23:41:01.126147+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | {"time": "2026-10-12T23:41:01.184396+00:00", "service": "api", "event": "login", "user": "admin", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | HTTP Request: POST http://booking-service:8001/bookings "HTTP/1.1 201 Created"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 201 Created
+api-1               | HTTP Request: DELETE http://booking-service:8001/pitches/2 "HTTP/1.1 409 Conflict"
+api-1               | INFO:     172.19.0.5:36448 - "DELETE /pitches/2 HTTP/1.1" 409 Conflict
+api-1               | {"time": "2026-10-12T23:41:01.259865+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | HTTP Request: POST http://booking-service:8001/bookings "HTTP/1.1 201 Created"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 201 Created
+api-1               | {"time": "2026-10-12T23:41:01.324522+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | HTTP Request: POST http://booking-service:8001/bookings "HTTP/1.1 201 Created"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 201 Created
+api-1               | {"time": "2026-10-12T23:41:01.389331+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | {"time": "2026-10-12T23:41:01.448100+00:00", "service": "api", "event": "login", "user": "andreea", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | HTTP Request: POST http://booking-service:8001/bookings "HTTP/1.1 201 Created"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 201 Created
+api-1               | HTTP Request: POST http://booking-service:8001/bookings "HTTP/1.1 409 Conflict"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 409 Conflict
+api-1               | {"time": "2026-10-12T23:41:01.526414+00:00", "service": "api", "event": "login", "user": "admin", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | HTTP Request: POST http://booking-service:8001/bookings "HTTP/1.1 403 Forbidden"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 403 Forbidden
+api-1               | {"time": "2026-10-12T23:41:01.592906+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 422 Unprocessable Content
+api-1               | {"time": "2026-10-12T23:41:01.652189+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 422 Unprocessable Content
+api-1               | {"time": "2026-10-12T23:41:01.716804+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 422 Unprocessable Content
+api-1               | {"time": "2026-10-12T23:41:01.775715+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 422 Unprocessable Content
+api-1               | {"time": "2026-10-12T23:41:01.836881+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 422 Unprocessable Content
+api-1               | {"time": "2026-10-12T23:41:01.895681+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | {"time": "2026-10-12T23:41:01.959165+00:00", "service": "api", "event": "login", "user": "andreea", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | HTTP Request: POST http://booking-service:8001/bookings "HTTP/1.1 201 Created"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 201 Created
+api-1               | HTTP Request: GET http://booking-service:8001/bookings "HTTP/1.1 200 OK"
+api-1               | INFO:     172.19.0.5:36448 - "GET /bookings HTTP/1.1" 200 OK
+api-1               | {"time": "2026-10-12T23:41:02.032766+00:00", "service": "api", "event": "login", "user": "admin", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | {"time": "2026-10-12T23:41:02.089546+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     127.0.0.1:56982 - "GET /health HTTP/1.1" 200 OK
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | {"time": "2026-10-12T23:41:02.145825+00:00", "service": "api", "event": "login", "user": "andreea", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | HTTP Request: POST http://booking-service:8001/bookings "HTTP/1.1 201 Created"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 201 Created
+api-1               | HTTP Request: POST http://booking-service:8001/bookings "HTTP/1.1 201 Created"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 201 Created
+api-1               | HTTP Request: GET http://booking-service:8001/bookings "HTTP/1.1 200 OK"
+api-1               | INFO:     172.19.0.5:36448 - "GET /bookings HTTP/1.1" 200 OK
+api-1               | {"time": "2026-10-12T23:41:02.233777+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | {"time": "2026-10-12T23:41:02.289726+00:00", "service": "api", "event": "login", "user": "andreea", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | HTTP Request: POST http://booking-service:8001/bookings "HTTP/1.1 201 Created"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 201 Created
+api-1               | HTTP Request: POST http://booking-service:8001/bookings/13/cancel "HTTP/1.1 403 Forbidden"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings/13/cancel HTTP/1.1" 403 Forbidden
+api-1               | HTTP Request: GET http://booking-service:8001/bookings "HTTP/1.1 200 OK"
+api-1               | INFO:     172.19.0.5:36448 - "GET /bookings HTTP/1.1" 200 OK
+api-1               | {"time": "2026-10-12T23:41:02.373529+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | HTTP Request: POST http://booking-service:8001/bookings "HTTP/1.1 201 Created"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 201 Created
+api-1               | HTTP Request: POST http://booking-service:8001/bookings/14/cancel "HTTP/1.1 200 OK"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings/14/cancel HTTP/1.1" 200 OK
+api-1               | HTTP Request: POST http://booking-service:8001/bookings/14/cancel "HTTP/1.1 409 Conflict"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings/14/cancel HTTP/1.1" 409 Conflict
+api-1               | {"time": "2026-10-12T23:41:02.462609+00:00", "service": "api", "event": "login", "user": "admin", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | {"time": "2026-10-12T23:41:02.522577+00:00", "service": "api", "event": "login", "user": "andreea", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | HTTP Request: POST http://booking-service:8001/bookings "HTTP/1.1 201 Created"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 201 Created
+api-1               | HTTP Request: POST http://booking-service:8001/bookings/15/cancel "HTTP/1.1 200 OK"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings/15/cancel HTTP/1.1" 200 OK
+api-1               | {"time": "2026-10-12T23:41:02.607520+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | HTTP Request: POST http://booking-service:8001/bookings/999999/cancel "HTTP/1.1 404 Not Found"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings/999999/cancel HTTP/1.1" 404 Not Found
+api-1               | {"time": "2026-10-12T23:41:02.676313+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | {"time": "2026-10-12T23:41:02.738764+00:00", "service": "api", "event": "login", "user": "andreea", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | HTTP Request: POST http://booking-service:8001/bookings "HTTP/1.1 201 Created"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 201 Created
+api-1               | HTTP Request: POST http://booking-service:8001/bookings "HTTP/1.1 201 Created"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 201 Created
+api-1               | HTTP Request: POST http://booking-service:8001/bookings "HTTP/1.1 201 Created"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 201 Created
+api-1               | HTTP Request: POST http://booking-service:8001/bookings/18/cancel "HTTP/1.1 200 OK"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings/18/cancel HTTP/1.1" 200 OK
+api-1               | HTTP Request: POST http://booking-service:8001/bookings "HTTP/1.1 201 Created"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 201 Created
+api-1               | HTTP Request: POST http://schedule-service:8002/jobs "HTTP/1.1 201 Created"
+api-1               | INFO:     172.19.0.5:36448 - "POST /schedules HTTP/1.1" 201 Created
+api-1               | HTTP Request: GET http://booking-service:8001/schedules/2 "HTTP/1.1 200 OK"
+api-1               | INFO:     172.19.0.5:36448 - "GET /schedules/2 HTTP/1.1" 200 OK
+api-1               | {"time": "2026-10-12T23:41:02.880549+00:00", "service": "api", "event": "login", "user": "andreea", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | HTTP Request: POST http://schedule-service:8002/jobs "HTTP/1.1 201 Created"
+api-1               | INFO:     172.19.0.5:36448 - "POST /schedules HTTP/1.1" 201 Created
+api-1               | HTTP Request: GET http://booking-service:8001/schedules/3 "HTTP/1.1 200 OK"
+api-1               | INFO:     172.19.0.5:36448 - "GET /schedules/3 HTTP/1.1" 200 OK
+api-1               | {"time": "2026-10-12T23:41:02.969766+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | {"time": "2026-10-12T23:41:03.027061+00:00", "service": "api", "event": "login", "user": "andreea", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | HTTP Request: POST http://schedule-service:8002/jobs "HTTP/1.1 201 Created"
+api-1               | INFO:     172.19.0.5:36448 - "POST /schedules HTTP/1.1" 201 Created
+api-1               | HTTP Request: GET http://booking-service:8001/schedules/4 "HTTP/1.1 403 Forbidden"
+api-1               | INFO:     172.19.0.5:36448 - "GET /schedules/4 HTTP/1.1" 403 Forbidden
+api-1               | {"time": "2026-10-12T23:41:03.113015+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | {"time": "2026-10-12T23:41:03.169160+00:00", "service": "api", "event": "login", "user": "admin", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | HTTP Request: POST http://schedule-service:8002/jobs "HTTP/1.1 201 Created"
+api-1               | INFO:     172.19.0.5:36448 - "POST /schedules HTTP/1.1" 201 Created
+api-1               | HTTP Request: GET http://booking-service:8001/schedules/5 "HTTP/1.1 403 Forbidden"
+api-1               | INFO:     172.19.0.5:36448 - "GET /schedules/5 HTTP/1.1" 403 Forbidden
+api-1               | {"time": "2026-10-12T23:41:03.256981+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | HTTP Request: GET http://booking-service:8001/schedules/999999 "HTTP/1.1 404 Not Found"
+api-1               | INFO:     172.19.0.5:36448 - "GET /schedules/999999 HTTP/1.1" 404 Not Found
+api-1               | {"time": "2026-10-12T23:41:03.321490+00:00", "service": "api", "event": "login", "user": "admin", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | INFO:     172.19.0.5:36448 - "POST /schedules HTTP/1.1" 403 Forbidden
+api-1               | {"time": "2026-10-12T23:41:03.379477+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | INFO:     172.19.0.5:36448 - "POST /schedules HTTP/1.1" 422 Unprocessable Content
+api-1               | {"time": "2026-10-12T23:41:03.439776+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | INFO:     172.19.0.5:36448 - "POST /schedules HTTP/1.1" 422 Unprocessable Content
+api-1               | {"time": "2026-10-12T23:41:03.498520+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | INFO:     172.19.0.5:36448 - "POST /schedules HTTP/1.1" 422 Unprocessable Content
+api-1               | {"time": "2026-10-12T23:41:03.556543+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | {"time": "2026-10-12T23:41:03.612553+00:00", "service": "api", "event": "login", "user": "andreea", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | HTTP Request: POST http://schedule-service:8002/jobs "HTTP/1.1 201 Created"
+api-1               | INFO:     172.19.0.5:36448 - "POST /schedules HTTP/1.1" 201 Created
+api-1               | HTTP Request: GET http://booking-service:8001/schedules/6 "HTTP/1.1 403 Forbidden"
+api-1               | INFO:     172.19.0.5:36448 - "GET /schedules/6 HTTP/1.1" 403 Forbidden
+api-1               | {"time": "2026-10-12T23:41:03.697299+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | HTTP Request: POST http://booking-service:8001/bookings "HTTP/1.1 201 Created"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 201 Created
+api-1               | HTTP Request: GET http://booking-service:8001/bookings?status=active "HTTP/1.1 200 OK"
+api-1               | INFO:     172.19.0.5:36448 - "GET /bookings?status=active HTTP/1.1" 200 OK
+api-1               | {"time": "2026-10-12T23:41:03.772343+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | {"time": "2026-10-12T23:41:03.827704+00:00", "service": "api", "event": "login", "user": "andreea", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | HTTP Request: POST http://booking-service:8001/bookings "HTTP/1.1 201 Created"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 201 Created
+api-1               | HTTP Request: GET http://booking-service:8001/bookings?status=x%27+OR+%271%27%3D%271 "HTTP/1.1 422 Unprocessable Content"
+api-1               | INFO:     172.19.0.5:36448 - "GET /bookings?status=x%27+OR+%271%27%3D%271 HTTP/1.1" 422 Unprocessable Content
+api-1               | {"time": "2026-10-12T23:41:03.899204+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | HTTP Request: POST http://booking-service:8001/bookings "HTTP/1.1 422 Unprocessable Content"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 422 Unprocessable Content
+api-1               | {"time": "2026-10-12T23:41:03.965855+00:00", "service": "api", "event": "login", "user": "darius", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | {"time": "2026-10-12T23:41:04.023945+00:00", "service": "api", "event": "login", "user": "andreea", "outcome": "success"}
+api-1               | INFO:     172.19.0.5:36448 - "POST /login HTTP/1.1" 200 OK
+api-1               | HTTP Request: POST http://booking-service:8001/bookings "HTTP/1.1 201 Created"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 201 Created
+api-1               | HTTP Request: POST http://booking-service:8001/bookings "HTTP/1.1 201 Created"
+api-1               | INFO:     172.19.0.5:36448 - "POST /bookings HTTP/1.1" 201 Created
+api-1               | HTTP Request: POST http://schedule-service:8002/jobs "HTTP/1.1 201 Created"
+api-1               | INFO:     172.19.0.5:36448 - "POST /schedules HTTP/1.1" 201 Created
+api-1               | HTTP Request: GET http://booking-service:8001/schedules/7 "HTTP/1.1 200 OK"
+api-1               | INFO:     172.19.0.5:36448 - "GET /schedules/7 HTTP/1.1" 200 OK
+booking-service-1   | {"time": "2026-10-12T23:41:02.298398+00:00", "service": "booking-service", "actor": "darius", "method": "POST", "path": "/bookings", "status": 201}
+booking-service-1   | INFO:     172.19.0.4:48402 - "POST /bookings/13/cancel HTTP/1.1" 403 Forbidden
+booking-service-1   | {"time": "2026-10-12T23:41:02.307286+00:00", "service": "booking-service", "actor": "andreea", "method": "POST", "path": "/bookings/13/cancel", "status": 403}
+booking-service-1   | INFO:     172.19.0.4:48406 - "GET /bookings HTTP/1.1" 200 OK
+booking-service-1   | {"time": "2026-10-12T23:41:02.383361+00:00", "service": "booking-service", "actor": "darius", "method": "POST", "path": "/bookings", "status": 201}
+booking-service-1   | INFO:     172.19.0.4:48408 - "POST /bookings HTTP/1.1" 201 Created
+booking-service-1   | {"time": "2026-10-12T23:41:02.392967+00:00", "service": "booking-service", "actor": "darius", "method": "POST", "path": "/bookings/14/cancel", "status": 200}
+booking-service-1   | INFO:     172.19.0.4:48420 - "POST /bookings/14/cancel HTTP/1.1" 200 OK
+booking-service-1   | {"time": "2026-10-12T23:41:02.402007+00:00", "service": "booking-service", "actor": "darius", "method": "POST", "path": "/bookings/14/cancel", "status": 409}
+booking-service-1   | INFO:     172.19.0.4:48432 - "POST /bookings/14/cancel HTTP/1.1" 409 Conflict
+booking-service-1   | {"time": "2026-10-12T23:41:02.531826+00:00", "service": "booking-service", "actor": "andreea", "method": "POST", "path": "/bookings", "status": 201}
+booking-service-1   | INFO:     172.19.0.4:48438 - "POST /bookings HTTP/1.1" 201 Created
+booking-service-1   | INFO:     172.19.0.4:48440 - "POST /bookings/15/cancel HTTP/1.1" 200 OK
+booking-service-1   | {"time": "2026-10-12T23:41:02.539696+00:00", "service": "booking-service", "actor": "admin", "method": "POST", "path": "/bookings/15/cancel", "status": 200}
+booking-service-1   | {"time": "2026-10-12T23:41:02.616415+00:00", "service": "booking-service", "actor": "darius", "method": "POST", "path": "/bookings/999999/cancel", "status": 404}
+booking-service-1   | INFO:     172.19.0.4:48444 - "POST /bookings/999999/cancel HTTP/1.1" 404 Not Found
+booking-service-1   | {"time": "2026-10-12T23:41:02.746934+00:00", "service": "booking-service", "actor": "darius", "method": "POST", "path": "/bookings", "status": 201}
+booking-service-1   | INFO:     172.19.0.4:48448 - "POST /bookings HTTP/1.1" 201 Created
+booking-service-1   | INFO:     172.19.0.4:48454 - "POST /bookings HTTP/1.1" 201 Created
+booking-service-1   | {"time": "2026-10-12T23:41:02.754199+00:00", "service": "booking-service", "actor": "andreea", "method": "POST", "path": "/bookings", "status": 201}
+booking-service-1   | INFO:     172.19.0.4:48458 - "POST /bookings HTTP/1.1" 201 Created
+booking-service-1   | {"time": "2026-10-12T23:41:02.761417+00:00", "service": "booking-service", "actor": "darius", "method": "POST", "path": "/bookings", "status": 201}
+booking-service-1   | INFO:     172.19.0.4:48462 - "POST /bookings/18/cancel HTTP/1.1" 200 OK
+booking-service-1   | {"time": "2026-10-12T23:41:02.768698+00:00", "service": "booking-service", "actor": "darius", "method": "POST", "path": "/bookings/18/cancel", "status": 200}
+booking-service-1   | INFO:     172.19.0.4:48464 - "POST /bookings HTTP/1.1" 201 Created
+booking-service-1   | {"time": "2026-10-12T23:41:02.776513+00:00", "service": "booking-service", "actor": "darius", "method": "POST", "path": "/bookings", "status": 201}
+booking-service-1   | INFO:     172.19.0.3:41490 - "GET /jobs/bookings HTTP/1.1" 200 OK
+booking-service-1   | {"time": "2026-10-12T23:41:02.816300+00:00", "service": "booking-service", "actor": null, "method": "POST", "path": "/jobs/schedules", "status": 201}
+booking-service-1   | INFO:     172.19.0.3:41498 - "POST /jobs/schedules HTTP/1.1" 201 Created
+booking-service-1   | INFO:     172.19.0.4:48474 - "GET /schedules/2 HTTP/1.1" 200 OK
+booking-service-1   | INFO:     172.19.0.3:41502 - "GET /jobs/bookings HTTP/1.1" 200 OK
+booking-service-1   | INFO:     172.19.0.3:41518 - "POST /jobs/schedules HTTP/1.1" 201 Created
+booking-service-1   | {"time": "2026-10-12T23:41:02.901229+00:00", "service": "booking-service", "actor": null, "method": "POST", "path": "/jobs/schedules", "status": 201}
+booking-service-1   | INFO:     172.19.0.4:48478 - "GET /schedules/3 HTTP/1.1" 200 OK
+booking-service-1   | INFO:     172.19.0.3:41528 - "GET /jobs/bookings HTTP/1.1" 200 OK
+booking-service-1   | INFO:     172.19.0.3:41540 - "POST /jobs/schedules HTTP/1.1" 201 Created
+booking-service-1   | {"time": "2026-10-12T23:41:03.047596+00:00", "service": "booking-service", "actor": null, "method": "POST", "path": "/jobs/schedules", "status": 201}
+booking-service-1   | INFO:     172.19.0.4:48494 - "GET /schedules/4 HTTP/1.1" 403 Forbidden
+booking-service-1   | {"time": "2026-10-12T23:41:03.056161+00:00", "service": "booking-service", "actor": "andreea", "method": "GET", "path": "/schedules/4", "status": 403}
+booking-service-1   | INFO:     172.19.0.3:41542 - "GET /jobs/bookings HTTP/1.1" 200 OK
+booking-service-1   | {"time": "2026-10-12T23:41:03.191322+00:00", "service": "booking-service", "actor": null, "method": "POST", "path": "/jobs/schedules", "status": 201}
+booking-service-1   | INFO:     172.19.0.3:41556 - "POST /jobs/schedules HTTP/1.1" 201 Created
+booking-service-1   | {"time": "2026-10-12T23:41:03.199536+00:00", "service": "booking-service", "actor": "admin", "method": "GET", "path": "/schedules/5", "status": 403}
+booking-service-1   | INFO:     172.19.0.4:48506 - "GET /schedules/5 HTTP/1.1" 403 Forbidden
+booking-service-1   | INFO:     172.19.0.4:48520 - "GET /schedules/999999 HTTP/1.1" 404 Not Found
+booking-service-1   | INFO:     172.19.0.3:41558 - "GET /jobs/bookings HTTP/1.1" 200 OK
+booking-service-1   | INFO:     172.19.0.3:41562 - "POST /jobs/schedules HTTP/1.1" 201 Created
+booking-service-1   | {"time": "2026-10-12T23:41:03.632520+00:00", "service": "booking-service", "actor": null, "method": "POST", "path": "/jobs/schedules", "status": 201}
+booking-service-1   | INFO:     172.19.0.4:48526 - "GET /schedules/6 HTTP/1.1" 403 Forbidden
+booking-service-1   | {"time": "2026-10-12T23:41:03.640338+00:00", "service": "booking-service", "actor": "andreea", "method": "GET", "path": "/schedules/6", "status": 403}
+booking-service-1   | INFO:     172.19.0.4:48532 - "POST /bookings HTTP/1.1" 201 Created
+booking-service-1   | {"time": "2026-10-12T23:41:03.706050+00:00", "service": "booking-service", "actor": "darius", "method": "POST", "path": "/bookings", "status": 201}
+booking-service-1   | INFO:     172.19.0.4:48540 - "GET /bookings?status=active HTTP/1.1" 200 OK
+booking-service-1   | {"time": "2026-10-12T23:41:03.835745+00:00", "service": "booking-service", "actor": "darius", "method": "POST", "path": "/bookings", "status": 201}
+booking-service-1   | INFO:     172.19.0.4:48552 - "POST /bookings HTTP/1.1" 201 Created
+booking-service-1   | INFO:     172.19.0.4:48562 - "GET /bookings?status=x%27+OR+%271%27%3D%271 HTTP/1.1" 422 Unprocessable Content
+booking-service-1   | {"time": "2026-10-12T23:41:03.906964+00:00", "service": "booking-service", "actor": "darius", "method": "POST", "path": "/bookings", "status": 422}
+booking-service-1   | INFO:     172.19.0.4:48578 - "POST /bookings HTTP/1.1" 422 Unprocessable Content
+booking-service-1   | INFO:     172.19.0.4:48584 - "POST /bookings HTTP/1.1" 201 Created
+booking-service-1   | {"time": "2026-10-12T23:41:04.032502+00:00", "service": "booking-service", "actor": "darius", "method": "POST", "path": "/bookings", "status": 201}
+booking-service-1   | INFO:     172.19.0.4:48588 - "POST /bookings HTTP/1.1" 201 Created
+booking-service-1   | {"time": "2026-10-12T23:41:04.040147+00:00", "service": "booking-service", "actor": "andreea", "method": "POST", "path": "/bookings", "status": 201}
+booking-service-1   | INFO:     172.19.0.3:41574 - "GET /jobs/bookings HTTP/1.1" 200 OK
+booking-service-1   | INFO:     172.19.0.3:41580 - "POST /jobs/schedules HTTP/1.1" 201 Created
+booking-service-1   | {"time": "2026-10-12T23:41:04.062260+00:00", "service": "booking-service", "actor": null, "method": "POST", "path": "/jobs/schedules", "status": 201}
+booking-service-1   | INFO:     172.19.0.4:48602 - "GET /schedules/7 HTTP/1.1" 200 OK
